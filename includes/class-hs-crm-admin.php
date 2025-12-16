@@ -83,104 +83,93 @@ class HS_CRM_Admin {
                 </a>
             </div>
             
-            <div class="hs-crm-table-container">
-                <table class="wp-list-table widefat fixed hs-crm-enquiries-table">
-                    <tbody>
-                        <?php if (empty($enquiries)): ?>
-                            <tr>
-                                <td colspan="7" style="text-align: center;">No enquiries found.</td>
+            <?php if (empty($enquiries)): ?>
+                <div class="hs-crm-no-enquiries">
+                    <p style="text-align: center; padding: 20px;">No enquiries found.</p>
+                </div>
+            <?php else: ?>
+                <?php 
+                $row_index = 0;
+                foreach ($enquiries as $enquiry): 
+                    $notes = HS_CRM_Database::get_notes($enquiry->id);
+                    $row_class = ($row_index % 2 === 0) ? 'hs-crm-even-row' : 'hs-crm-odd-row';
+                    $row_index++;
+                ?>
+                    <!-- Individual table for each enquiry -->
+                    <table class="wp-list-table widefat fixed hs-crm-enquiries-table hs-crm-single-enquiry-table">
+                        <tbody>
+                            <!-- Customer Header Row -->
+                            <tr class="hs-crm-customer-header-row <?php echo $row_class; ?>">
+                                <th style="width: 10%;">Created</th>
+                                <th style="width: 18%;">Contact Info</th>
+                                <th style="width: 20%;">Address</th>
+                                <th style="width: 10%;">Status</th>
+                                <th style="width: 18%;">Status Change</th>
+                                <th style="width: 24%;">Action</th>
                             </tr>
-                        <?php else: ?>
-                            <?php 
-                            $row_index = 0;
-                            foreach ($enquiries as $enquiry): 
-                                $notes = HS_CRM_Database::get_notes($enquiry->id);
-                                $row_class = ($row_index % 2 === 0) ? 'hs-crm-even-row' : 'hs-crm-odd-row';
-                                $row_index++;
-                            ?>
-                                <!-- Customer Header Row -->
-                                <tr class="hs-crm-customer-header-row <?php echo $row_class; ?>">
-                                    <th style="width: 10%;">Created</th>
-                                    <th style="width: 12%;">First Message</th>
-                                    <th style="width: 16%;">Contact Info</th>
-                                    <th style="width: 18%;">Address</th>
-                                    <th style="width: 10%;">Status</th>
-                                    <th style="width: 13%;">Status Change</th>
-                                    <th style="width: 21%;">Action</th>
-                                </tr>
-                                <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                    <td><?php echo esc_html(date('d/m/Y', strtotime($enquiry->created_at))); ?></td>
-                                    <td>
-                                        <?php 
-                                        if (!empty($enquiry->first_email_sent_at)) {
-                                            echo esc_html(date('d/m/Y H:i', strtotime($enquiry->first_email_sent_at)));
-                                        } else {
-                                            echo '<small style="color: #999;">Not sent</small>';
-                                        }
-                                        ?>
-                                    </td>
-                                    <td>
-                                        <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
-                                        <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small><br>
-                                        <small style="color: #666;"><?php echo esc_html($enquiry->phone); ?></small>
-                                    </td>
-                                    <td><?php echo esc_html($enquiry->address); ?></td>
-                                    <td>
-                                        <span class="hs-crm-status-badge status-<?php echo esc_attr(strtolower(str_replace(' ', '-', $enquiry->status))); ?>">
-                                            <?php echo esc_html($enquiry->status); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <select class="hs-crm-status-select" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" data-current-status="<?php echo esc_attr($enquiry->status); ?>">
-                                            <option value="">Change Status...</option>
-                                            <option value="Not Actioned">Not Actioned</option>
-                                            <option value="Emailed">Emailed</option>
-                                            <option value="Quoted">Quoted</option>
-                                            <option value="Completed">Completed</option>
-                                            <option value="Archived">Archived</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="hs-crm-action-select" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                            <option value="">Select Action...</option>
-                                            <option value="send_quote">Send Quote</option>
-                                            <option value="send_invoice">Send Invoice</option>
-                                            <option value="send_receipt">Send Receipt</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Notes rows -->
-                                <?php if (!empty($notes)): ?>
-                                    <?php foreach ($notes as $note): ?>
-                                        <tr class="hs-crm-note-row <?php echo $row_class; ?>" data-note-id="<?php echo esc_attr($note->id); ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                            <td colspan="4" class="hs-crm-note-content">
-                                                <div class="hs-crm-note-text"><?php echo esc_html(stripslashes($note->note)); ?></div>
-                                            </td>
-                                            <td class="hs-crm-note-date">
-                                                <?php echo esc_html(date('d/m/Y H:i', strtotime($note->created_at))); ?>
-                                            </td>
-                                            <td colspan="2" class="hs-crm-note-actions">
-                                                <button type="button" class="button button-small hs-crm-delete-note" data-note-id="<?php echo esc_attr($note->id); ?>">Delete</button>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                                
-                                <!-- Add note row -->
-                                <tr class="hs-crm-add-note-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                    <td colspan="6">
-                                        <textarea class="hs-crm-new-note" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" rows="2" placeholder="Add a new note..."></textarea>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="button button-small hs-crm-add-note" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">Add Note</button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                            <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                <td><?php echo esc_html(date('d/m/Y', strtotime($enquiry->created_at))); ?></td>
+                                <td>
+                                    <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
+                                    <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small><br>
+                                    <small style="color: #666;"><?php echo esc_html($enquiry->phone); ?></small>
+                                </td>
+                                <td><?php echo esc_html($enquiry->address); ?></td>
+                                <td>
+                                    <span class="hs-crm-status-badge status-<?php echo esc_attr(strtolower(str_replace(' ', '-', $enquiry->status))); ?>">
+                                        <?php echo esc_html($enquiry->status); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <select class="hs-crm-status-select" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" data-current-status="<?php echo esc_attr($enquiry->status); ?>">
+                                        <option value="">Change Status...</option>
+                                        <option value="Not Actioned">Not Actioned</option>
+                                        <option value="Emailed">Emailed</option>
+                                        <option value="Quoted">Quoted</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Archived">Archived</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="hs-crm-action-select" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                        <option value="">Select Action...</option>
+                                        <option value="send_quote">Send Quote</option>
+                                        <option value="send_invoice">Send Invoice</option>
+                                        <option value="send_receipt">Send Receipt</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            
+                            <!-- Notes rows -->
+                            <?php if (!empty($notes)): ?>
+                                <?php foreach ($notes as $note): ?>
+                                    <tr class="hs-crm-note-row <?php echo $row_class; ?>" data-note-id="<?php echo esc_attr($note->id); ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                        <td class="hs-crm-note-date">
+                                            <?php echo esc_html(date('d/m/Y H:i', strtotime($note->created_at))); ?>
+                                        </td>
+                                        <td colspan="3" class="hs-crm-note-content">
+                                            <div class="hs-crm-note-text"><?php echo esc_html(stripslashes($note->note)); ?></div>
+                                        </td>
+                                        <td colspan="2" class="hs-crm-note-actions">
+                                            <button type="button" class="button button-small hs-crm-delete-note" data-note-id="<?php echo esc_attr($note->id); ?>">Delete</button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            
+                            <!-- Add note row -->
+                            <tr class="hs-crm-add-note-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                <td colspan="5">
+                                    <textarea class="hs-crm-new-note" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" rows="2" placeholder="Add a new note..."></textarea>
+                                </td>
+                                <td>
+                                    <button type="button" class="button button-small hs-crm-add-note" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">Add Note</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
         
         <!-- Email Modal -->

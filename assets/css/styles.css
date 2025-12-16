@@ -135,25 +135,17 @@
     border-bottom: 2px solid #fff;
 }
 
-.hs-crm-table-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 0;
-    box-shadow: none;
-    border: none;
-}
-
-.hs-crm-enquiries-table {
-    margin-top: 0;
+.hs-crm-single-enquiry-table {
+    margin-bottom: 20px;
     border-collapse: collapse;
     border: none !important;
 }
 
-.hs-crm-enquiries-table thead {
+.hs-crm-single-enquiry-table thead {
     display: none !important;
 }
 
-.hs-crm-enquiries-table th {
+.hs-crm-single-enquiry-table th {
     background: #f9f9f9;
     font-weight: 600;
 }
@@ -209,7 +201,7 @@
 }
 
 .hs-crm-note-content {
-    padding-left: 20px !important;
+    padding-left: 12px !important;
 }
 
 .hs-crm-note-text {
@@ -247,15 +239,7 @@
     border-right: 1px solid #ddd !important;
 }
 
-/* Create 10px gap between customer enquiries */
-tbody tr.hs-crm-customer-header-row {
-    border-top: 10px solid transparent;
-}
-
-/* Prevent double border on first customer */
-tbody tr.hs-crm-customer-header-row:first-child {
-    border-top: none;
-}
+/* Gap between enquiry tables is handled by margin-bottom on .hs-crm-single-enquiry-table */
 
 /* Customer header row styling */
 .hs-crm-customer-header-row th {

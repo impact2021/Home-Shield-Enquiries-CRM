@@ -3,7 +3,7 @@
  * Plugin Name: Home Shield Enquiries CRM
  * Plugin URI: https://github.com/impact2021/Home-Shield-Enquiries-CRM
  * Description: A CRM system for managing painter enquiries with contact form and admin dashboard
- * Version: 1.4
+ * Version: 2.0
  * Author: Impact Websites
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('HS_CRM_VERSION', '1.4');
+define('HS_CRM_VERSION', '2.0');
 define('HS_CRM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HS_CRM_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -67,6 +67,54 @@ function hs_crm_init() {
     $email = new HS_CRM_Email();
 }
 add_action('plugins_loaded', 'hs_crm_init');
+
+/**
+ * Format date with plugin timezone setting
+ * 
+ * @param string $mysql_date Date in MySQL format (Y-m-d H:i:s)
+ * @param string $format Date format (default: 'd/m/Y H:i')
+ * @return string Formatted date in plugin timezone
+ */
+function hs_crm_format_date($mysql_date, $format = 'd/m/Y H:i') {
+    if (empty($mysql_date)) {
+        return '';
+    }
+    
+    // Get the plugin timezone setting
+    $timezone_string = get_option('hs_crm_timezone', 'Pacific/Auckland');
+    
+    try {
+        // Create DateTime object from MySQL date (which is in UTC)
+        $date = new DateTime($mysql_date, new DateTimeZone('UTC'));
+        
+        // Convert to plugin timezone
+        $date->setTimezone(new DateTimeZone($timezone_string));
+        
+        // Format and return
+        return $date->format($format);
+    } catch (Exception $e) {
+        // Fallback to original date if timezone conversion fails
+        return $mysql_date;
+    }
+}
+
+/**
+ * Get current time formatted in plugin timezone
+ * 
+ * @param string $format Date format (default: 'd/m/Y H:i')
+ * @return string Formatted current time in plugin timezone
+ */
+function hs_crm_current_time_formatted($format = 'd/m/Y H:i') {
+    $timezone_string = get_option('hs_crm_timezone', 'Pacific/Auckland');
+    
+    try {
+        $date = new DateTime('now', new DateTimeZone($timezone_string));
+        return $date->format($format);
+    } catch (Exception $e) {
+        // Fallback to wp_date
+        return wp_date($format);
+    }
+}
 
 /**
  * Check and update database if needed

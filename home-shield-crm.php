@@ -87,7 +87,12 @@ function hs_crm_format_date($mysql_date, $format = 'd/m/Y H:i') {
         // Create DateTime object from MySQL date
         // MySQL CURRENT_TIMESTAMP uses the database server's timezone (usually UTC)
         // But we need to treat it as the WordPress site timezone for proper conversion
-        $wp_timezone = wp_timezone_string();
+        // For WordPress < 5.3 compatibility, check if wp_timezone_string exists
+        if (function_exists('wp_timezone_string')) {
+            $wp_timezone = wp_timezone_string();
+        } else {
+            $wp_timezone = get_option('timezone_string') ?: 'UTC';
+        }
         $date = new DateTime($mysql_date, new DateTimeZone($wp_timezone));
         
         // Convert to plugin timezone
@@ -96,8 +101,8 @@ function hs_crm_format_date($mysql_date, $format = 'd/m/Y H:i') {
         // Format and return
         return $date->format($format);
     } catch (Exception $e) {
-        // Fallback to original date if timezone conversion fails
-        return $mysql_date;
+        // Fallback to mysql2date for consistent formatting
+        return mysql2date($format, $mysql_date);
     }
 }
 

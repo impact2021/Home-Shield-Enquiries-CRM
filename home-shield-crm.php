@@ -3,7 +3,7 @@
  * Plugin Name: Home Shield Enquiries CRM
  * Plugin URI: https://github.com/impact2021/Home-Shield-Enquiries-CRM
  * Description: A CRM system for managing painter enquiries with contact form and admin dashboard
- * Version: 1.3
+ * Version: 1.4
  * Author: Impact Websites
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('HS_CRM_VERSION', '1.3');
+define('HS_CRM_VERSION', '1.4');
 define('HS_CRM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HS_CRM_PLUGIN_URL', plugin_dir_url(__FILE__));
 

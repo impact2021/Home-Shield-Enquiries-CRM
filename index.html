@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Shield Enquiries CRM - Quote Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Home Shield Painters</h1>
+            <h2>Quote Generator</h2>
+        </header>
+
+        <div class="quote-section">
+            <div class="client-info">
+                <h3>Client Information</h3>
+                <div class="form-group">
+                    <label for="clientName">Client Name:</label>
+                    <input type="text" id="clientName" placeholder="Enter client name">
+                </div>
+                <div class="form-group">
+                    <label for="clientEmail">Client Email:</label>
+                    <input type="email" id="clientEmail" placeholder="Enter client email">
+                </div>
+                <div class="form-group">
+                    <label for="quoteDate">Quote Date:</label>
+                    <input type="date" id="quoteDate">
+                </div>
+            </div>
+
+            <div class="quote-table-section">
+                <h3>Quote Details</h3>
+                <div class="gst-rate-section">
+                    <label for="gstRate">GST Rate (%):</label>
+                    <input type="number" id="gstRate" value="10" min="0" max="100" step="0.1">
+                </div>
+                
+                <table id="quoteTable" class="quote-table">
+                    <thead>
+                        <tr>
+                            <th>Description of Work</th>
+                            <th>Cost ($)</th>
+                            <th>GST ($)</th>
+                            <th>Total ($)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quoteTableBody">
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="totals-row">
+                            <td><strong>Total</strong></td>
+                            <td id="subtotal">$0.00</td>
+                            <td id="totalGst">$0.00</td>
+                            <td id="grandTotal">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <button id="addRowBtn" class="btn btn-primary">Add Row</button>
+            </div>
+
+            <div class="actions">
+                <button id="generateEmailBtn" class="btn btn-success">Generate Email Preview</button>
+                <button id="copyEmailBtn" class="btn btn-secondary">Copy Email HTML</button>
+            </div>
+        </div>
+
+        <div id="emailPreview" class="email-preview" style="display: none;">
+            <h3>Email Preview</h3>
+            <div id="emailContent"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -30,6 +30,7 @@ class HS_CRM_Email {
         $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : '';
         $message = isset($_POST['message']) ? wp_kses_post($_POST['message']) : '';
         $quote_items = isset($_POST['quote_items']) ? $_POST['quote_items'] : array();
+        $email_type = isset($_POST['email_type']) ? sanitize_text_field($_POST['email_type']) : 'send_quote';
         
         if (!$enquiry_id) {
             wp_send_json_error(array('message' => 'Invalid enquiry ID.'));
@@ -41,11 +42,11 @@ class HS_CRM_Email {
             wp_send_json_error(array('message' => 'Enquiry not found.'));
         }
         
-        // Build quote table HTML
-        $quote_html = $this->build_quote_table($quote_items);
+        // Build quote/invoice/receipt table HTML
+        $quote_html = $this->build_quote_table($quote_items, $email_type);
         
         // Build full email content
-        $email_content = $this->build_email_content($message, $quote_html, $enquiry);
+        $email_content = $this->build_email_content($message, $quote_html, $enquiry, $email_type);
         
         // Send to customer email
         $to = $enquiry->email;
@@ -66,7 +67,7 @@ class HS_CRM_Email {
     /**
      * Build quote table HTML
      */
-    private function build_quote_table($quote_items) {
+    private function build_quote_table($quote_items, $email_type = 'send_quote') {
         if (empty($quote_items)) {
             return '';
         }
@@ -130,7 +131,18 @@ class HS_CRM_Email {
     /**
      * Build complete email content
      */
-    private function build_email_content($message, $quote_html, $enquiry) {
+    private function build_email_content($message, $quote_html, $enquiry, $email_type = 'send_quote') {
+        // Determine section title based on email type
+        $section_title = 'Quote Details';
+        switch($email_type) {
+            case 'send_invoice':
+                $section_title = 'Invoice Details';
+                break;
+            case 'send_receipt':
+                $section_title = 'Receipt Details';
+                break;
+        }
+        
         $html = '<!DOCTYPE html>';
         $html .= '<html>';
         $html .= '<head><meta charset="UTF-8"></head>';
@@ -147,10 +159,10 @@ class HS_CRM_Email {
         $html .= '<p>' . nl2br(esc_html($message)) . '</p>';
         $html .= '</div>';
         
-        // Quote table - ensure it's always included if provided
+        // Quote/Invoice/Receipt table - ensure it's always included if provided
         if (!empty($quote_html)) {
             $html .= '<div style="padding: 20px;">';
-            $html .= '<h2>Quote Details</h2>';
+            $html .= '<h2>' . esc_html($section_title) . '</h2>';
             $html .= $quote_html;
             $html .= '</div>';
         }

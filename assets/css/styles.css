@@ -171,12 +171,15 @@
     color: #c62828;
 }
 
-.hs-crm-status-select {
+.hs-crm-status-select,
+.hs-crm-action-select {
     padding: 6px 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 13px;
     cursor: pointer;
+    width: 100%;
+    margin-bottom: 3px;
 }
 
 /* Modal Styles */

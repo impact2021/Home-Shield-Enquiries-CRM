@@ -102,12 +102,7 @@ jQuery(document).ready(function($) {
                         $select.data('current-status', newStatus);
                         $select.val('');
                         
-                        // Show email modal if needed
-                        if (response.data.trigger_email) {
-                            showEmailModal(response.data.enquiry);
-                        } else {
-                            alert(response.data.message);
-                        }
+                        alert(response.data.message);
                     } else {
                         alert('Error: ' + response.data.message);
                     }
@@ -118,10 +113,48 @@ jQuery(document).ready(function($) {
             });
         });
         
+        // Handle action dropdown (send quote/invoice/receipt)
+        $('.hs-crm-action-select').on('change', function() {
+            var $select = $(this);
+            var enquiryId = $select.data('enquiry-id');
+            var actionType = $select.val();
+            
+            if (!actionType) {
+                return;
+            }
+            
+            // Get enquiry data from the row
+            var $row = $select.closest('tr');
+            
+            // Fetch full enquiry data via AJAX
+            $.ajax({
+                url: hsCrmAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'hs_crm_get_enquiry',
+                    nonce: hsCrmAjax.nonce,
+                    enquiry_id: enquiryId
+                },
+                success: function(response) {
+                    if (response.success && response.data.enquiry) {
+                        showEmailModal(response.data.enquiry, actionType);
+                        $select.val('');
+                    } else {
+                        alert('Error: Could not load enquiry data.');
+                        $select.val('');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while loading enquiry data.');
+                    $select.val('');
+                }
+            });
+        });
+        
         // Email modal functionality
         var $modal = $('#hs-crm-email-modal');
         
-        function showEmailModal(enquiry) {
+        function showEmailModal(enquiry, emailType) {
             // Try to get first name, fall back to full name, then to generic greeting
             var firstName = enquiry.first_name || (enquiry.name ? enquiry.name.split(' ')[0] : '');
             var fullName = (enquiry.first_name + ' ' + enquiry.last_name).trim() || enquiry.name;
@@ -130,11 +163,37 @@ jQuery(document).ready(function($) {
             $('#email-to').val(enquiry.email);
             $('#email-customer').val(fullName + ' - ' + enquiry.phone);
             $('#email-customer-name').val(firstName);
+            $('#email-type').val(emailType);
             
-            // Set default message with customer's first name or generic greeting
+            // Set title, subject and message based on email type
             var greeting = firstName ? 'Dear ' + firstName : 'Dear Customer';
-            var defaultMessage = greeting + ',\n\nThank you for your enquiry. Please find our quote below:';
-            $('#email-message').val(defaultMessage);
+            var title, subject, message;
+            
+            switch(emailType) {
+                case 'send_quote':
+                    title = 'Send Quote';
+                    subject = 'Quote for Painting Services';
+                    message = greeting + ',\n\nThank you for your enquiry. Please find our quote below:';
+                    break;
+                case 'send_invoice':
+                    title = 'Send Invoice';
+                    subject = 'Invoice for Painting Services';
+                    message = greeting + ',\n\nThank you for your business. Please find your invoice below:';
+                    break;
+                case 'send_receipt':
+                    title = 'Send Receipt';
+                    subject = 'Receipt for Painting Services';
+                    message = greeting + ',\n\nThank you for your payment. Please find your receipt below:';
+                    break;
+                default:
+                    title = 'Send Email';
+                    subject = 'Home Shield Painters';
+                    message = greeting + ',\n\n';
+            }
+            
+            $('#email-modal-title').text(title);
+            $('#email-subject').val(subject);
+            $('#email-message').val(message);
             
             // Reset quote table to one row
             $('#quote-items-body').html(getQuoteItemRowHtml());
@@ -227,7 +286,8 @@ jQuery(document).ready(function($) {
                 enquiry_id: $('#email-enquiry-id').val(),
                 subject: $('#email-subject').val(),
                 message: $('#email-message').val(),
-                quote_items: quoteItems
+                quote_items: quoteItems,
+                email_type: $('#email-type').val()
             };
             
             $.ajax({

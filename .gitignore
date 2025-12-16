@@ -1,0 +1,37 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+*~
+
+# Node modules (if used for build tools)
+node_modules/
+
+# Composer (if used)
+vendor/
+
+# Build artifacts
+dist/
+build/
+
+# WordPress specific
+wp-config.php
+.htaccess
+
+# Backups
+*.sql
+*.sql.gz
+*.zip
+*.tar.gz

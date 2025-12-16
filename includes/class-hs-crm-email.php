@@ -166,42 +166,30 @@ class HS_CRM_Email {
         $html .= '<html>';
         $html .= '<head><meta charset="UTF-8"></head>';
         $html .= '<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">';
-        $html .= '<div style="max-width: 600px; margin: 0 auto; padding: 20px;">';
         
         // Header
-        $html .= '<div style="background-color: #0073aa; color: white; padding: 20px; text-align: center;">';
-        $html .= '<h1 style="margin: 0;">Home Shield Painters</h1>';
-        $html .= '</div>';
+        $html .= '<h1>Home Shield Painters</h1>';
         
         // Message content
-        $html .= '<div style="padding: 20px; background-color: #f9f9f9;">';
         $html .= '<p>' . nl2br(esc_html($message)) . '</p>';
-        $html .= '</div>';
         
         // Quote/Invoice/Receipt table - ensure it's always included if provided
         if (!empty($quote_html)) {
-            $html .= '<div style="padding: 20px;">';
             $html .= '<h2>' . esc_html($section_title) . '</h2>';
             $html .= $quote_html;
-            $html .= '</div>';
         }
         
         // Job details
-        $html .= '<div style="padding: 20px; background-color: #f9f9f9; margin-top: 20px;">';
         $html .= '<h3>Job Details</h3>';
         $html .= '<p><strong>Name:</strong> ' . esc_html($enquiry->first_name . ' ' . $enquiry->last_name) . '</p>';
         $html .= '<p><strong>Email:</strong> ' . esc_html($enquiry->email) . '</p>';
         $html .= '<p><strong>Address:</strong> ' . esc_html($enquiry->address) . '</p>';
         $html .= '<p><strong>Phone:</strong> ' . esc_html($enquiry->phone) . '</p>';
-        $html .= '</div>';
         
         // Footer
-        $html .= '<div style="padding: 20px; text-align: center; font-size: 12px; color: #666;">';
-        $html .= '<p>Thank you for choosing Home Shield Painters</p>';
-        $html .= '<p>This is an automated email. Please do not reply directly to this message.</p>';
-        $html .= '</div>';
+        $html .= '<p style="font-size: 12px; color: #666;">Thank you for choosing Home Shield Painters</p>';
+        $html .= '<p style="font-size: 12px; color: #666;">This is an automated email. Please do not reply directly to this message.</p>';
         
-        $html .= '</div>';
         $html .= '</body>';
         $html .= '</html>';
         

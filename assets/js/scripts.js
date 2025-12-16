@@ -45,7 +45,7 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     // Redirect to thank you page
-                    window.location.href = '/thank-you/';
+                    window.location.href = hsCrmAjax.thankYouUrl;
                 } else {
                     $messages.html('<div class="hs-crm-error">' + response.data.message + '</div>');
                     $submitBtn.prop('disabled', false).text('Submit Enquiry');

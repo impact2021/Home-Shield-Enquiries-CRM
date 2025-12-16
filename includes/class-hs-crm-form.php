@@ -148,7 +148,7 @@ class HS_CRM_Form {
         $admin_email = get_option('admin_email');
         $subject = 'New Enquiry - Home Shield Painters';
         
-        $dashboard_link = 'https://homeshieldpainters.co.nz/wp-admin/admin.php?page=hs-crm-enquiries';
+        $dashboard_link = admin_url('admin.php?page=hs-crm-enquiries');
         
         $message = '<!DOCTYPE html>';
         $message .= '<html>';

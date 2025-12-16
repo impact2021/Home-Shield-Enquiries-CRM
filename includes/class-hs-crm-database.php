@@ -164,8 +164,7 @@ class HS_CRM_Database {
             'Emailed' => 0,
             'Quoted' => 0,
             'Completed' => 0,
-            'Archived' => 0,
-            'Dead' => 0  // Keep for backward compatibility
+            'Archived' => 0
         );
         
         foreach ($results as $row) {
@@ -173,7 +172,10 @@ class HS_CRM_Database {
             if ($row->status === 'Dead') {
                 $counts['Archived'] += $row->count;
             } else {
-                $counts[$row->status] = $row->count;
+                if (!isset($counts[$row->status])) {
+                    $counts[$row->status] = 0;
+                }
+                $counts[$row->status] += $row->count;
             }
             $counts['all'] += $row->count;
             

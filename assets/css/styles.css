@@ -185,10 +185,6 @@
     border-top: 1px solid #ddd !important;
 }
 
-.hs-crm-enquiry-row td {
-    margin-top: 10px;
-}
-
 .hs-crm-note-row td {
     padding: 8px !important;
     border-top: 1px solid #e0e0e0 !important;
@@ -246,15 +242,13 @@
 }
 
 /* Create 10px gap between customer enquiries */
-.hs-crm-add-note-row {
-    margin-bottom: 10px;
+tbody tr.hs-crm-customer-header-row {
+    border-top: 10px solid transparent;
 }
 
-/* Add spacing after each customer group */
-.hs-crm-add-note-row::after {
-    content: '';
-    display: block;
-    height: 10px;
+/* Prevent double border on first customer */
+tbody tr.hs-crm-customer-header-row:first-child {
+    border-top: none;
 }
 
 /* Customer header row styling */

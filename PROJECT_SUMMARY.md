@@ -4,7 +4,7 @@
 
 A complete WordPress plugin for managing painter enquiries with contact form, admin dashboard, and automated quote generation with GST calculation.
 
-**Version:** 1.0.0  
+**Version:** 1.4  
 **Status:** ✅ Ready for Production  
 **Lines of Code:** ~1,484  
 **License:** GPL v2 or later

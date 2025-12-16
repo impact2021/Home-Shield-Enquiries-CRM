@@ -426,6 +426,6 @@ For issues with specific files:
 ---
 
 **Last Updated:** 2025-12-16
-**Version:** 1.0.0
+**Version:** 1.4
 **Total Files:** 15
 **Total Lines:** ~4,000+ (code + documentation)

@@ -44,7 +44,7 @@ class HS_CRM_Admin {
             return;
         }
         
-        $current_status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : 'all';
+        $current_status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : 'active';
         $enquiries = HS_CRM_Database::get_enquiries($current_status === 'all' ? null : $current_status);
         $counts = HS_CRM_Database::get_status_counts();
         
@@ -53,6 +53,10 @@ class HS_CRM_Admin {
             <h1>Home Shield Enquiries</h1>
             
             <div class="hs-crm-tabs">
+                <a href="?page=hs-crm-enquiries&status=active" 
+                   class="hs-crm-tab <?php echo $current_status === 'active' ? 'active' : ''; ?>">
+                    Active leads (<?php echo $counts['active']; ?>)
+                </a>
                 <a href="?page=hs-crm-enquiries&status=all" 
                    class="hs-crm-tab <?php echo $current_status === 'all' ? 'active' : ''; ?>">
                     All (<?php echo $counts['all']; ?>)
@@ -73,9 +77,9 @@ class HS_CRM_Admin {
                    class="hs-crm-tab <?php echo $current_status === 'Completed' ? 'active' : ''; ?>">
                     Completed (<?php echo $counts['Completed']; ?>)
                 </a>
-                <a href="?page=hs-crm-enquiries&status=Dead" 
-                   class="hs-crm-tab <?php echo $current_status === 'Dead' ? 'active' : ''; ?>">
-                    Dead (<?php echo $counts['Dead']; ?>)
+                <a href="?page=hs-crm-enquiries&status=Archived" 
+                   class="hs-crm-tab <?php echo $current_status === 'Archived' ? 'active' : ''; ?>">
+                    Archived (<?php echo $counts['Archived']; ?>)
                 </a>
             </div>
             
@@ -104,6 +108,15 @@ class HS_CRM_Admin {
                                 $row_class = ($row_index % 2 === 0) ? 'hs-crm-even-row' : 'hs-crm-odd-row';
                                 $row_index++;
                             ?>
+                                <!-- Customer Header Row -->
+                                <tr class="hs-crm-customer-header-row <?php echo $row_class; ?>">
+                                    <th style="width: 18%;">Contact Info</th>
+                                    <th style="width: 20%;">Address</th>
+                                    <th style="width: 12%;">Status</th>
+                                    <th style="width: 10%;">Created</th>
+                                    <th style="width: 15%;">Status Change</th>
+                                    <th style="width: 25%;">Action</th>
+                                </tr>
                                 <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
                                     <td>
                                         <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
@@ -124,7 +137,7 @@ class HS_CRM_Admin {
                                             <option value="Emailed">Emailed</option>
                                             <option value="Quoted">Quoted</option>
                                             <option value="Completed">Completed</option>
-                                            <option value="Dead">Dead</option>
+                                            <option value="Archived">Archived</option>
                                         </select>
                                     </td>
                                     <td>
@@ -142,7 +155,7 @@ class HS_CRM_Admin {
                                     <?php foreach ($notes as $note): ?>
                                         <tr class="hs-crm-note-row <?php echo $row_class; ?>" data-note-id="<?php echo esc_attr($note->id); ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
                                             <td colspan="3" class="hs-crm-note-content">
-                                                <div class="hs-crm-note-text"><?php echo esc_html($note->note); ?></div>
+                                                <div class="hs-crm-note-text"><?php echo esc_html(stripslashes($note->note)); ?></div>
                                             </td>
                                             <td class="hs-crm-note-date">
                                                 <?php echo esc_html(date('d/m/Y H:i', strtotime($note->created_at))); ?>

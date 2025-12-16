@@ -17,6 +17,8 @@ class HS_CRM_Admin {
         add_action('wp_ajax_hs_crm_update_status', array($this, 'ajax_update_status'));
         add_action('wp_ajax_hs_crm_save_notes', array($this, 'ajax_save_notes'));
         add_action('wp_ajax_hs_crm_get_enquiry', array($this, 'ajax_get_enquiry'));
+        add_action('wp_ajax_hs_crm_add_note', array($this, 'ajax_add_note'));
+        add_action('wp_ajax_hs_crm_delete_note', array($this, 'ajax_delete_note'));
     }
     
     /**
@@ -78,32 +80,36 @@ class HS_CRM_Admin {
             </div>
             
             <div class="hs-crm-table-container">
-                <table class="wp-list-table widefat fixed striped hs-crm-enquiries-table">
+                <table class="wp-list-table widefat fixed hs-crm-enquiries-table">
                     <thead>
                         <tr>
-                            <th style="width: 15%;">Name</th>
-                            <th style="width: 11%;">Phone</th>
-                            <th style="width: 15%;">Address</th>
-                            <th style="width: 10%;">Status</th>
-                            <th style="width: 8%;">Created</th>
-                            <th style="width: 10%;">Status Change</th>
-                            <th style="width: 13%;">Action</th>
-                            <th style="width: 18%;">Notes</th>
+                            <th style="width: 18%;">Contact Info</th>
+                            <th style="width: 20%;">Address</th>
+                            <th style="width: 12%;">Status</th>
+                            <th style="width: 10%;">Created</th>
+                            <th style="width: 15%;">Status Change</th>
+                            <th style="width: 25%;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($enquiries)): ?>
                             <tr>
-                                <td colspan="8" style="text-align: center;">No enquiries found.</td>
+                                <td colspan="6" style="text-align: center;">No enquiries found.</td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach ($enquiries as $enquiry): ?>
-                                <tr data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                            <?php 
+                            $row_index = 0;
+                            foreach ($enquiries as $enquiry): 
+                                $notes = HS_CRM_Database::get_notes($enquiry->id);
+                                $row_class = ($row_index % 2 === 0) ? 'hs-crm-even-row' : 'hs-crm-odd-row';
+                                $row_index++;
+                            ?>
+                                <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
                                     <td>
                                         <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
-                                        <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small>
+                                        <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small><br>
+                                        <small style="color: #666;"><?php echo esc_html($enquiry->phone); ?></small>
                                     </td>
-                                    <td><?php echo esc_html($enquiry->phone); ?></td>
                                     <td><?php echo esc_html($enquiry->address); ?></td>
                                     <td>
                                         <span class="hs-crm-status-badge status-<?php echo esc_attr(strtolower(str_replace(' ', '-', $enquiry->status))); ?>">
@@ -129,9 +135,32 @@ class HS_CRM_Admin {
                                             <option value="send_receipt">Send Receipt</option>
                                         </select>
                                     </td>
+                                </tr>
+                                
+                                <!-- Notes rows -->
+                                <?php if (!empty($notes)): ?>
+                                    <?php foreach ($notes as $note): ?>
+                                        <tr class="hs-crm-note-row <?php echo $row_class; ?>" data-note-id="<?php echo esc_attr($note->id); ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                            <td colspan="3" class="hs-crm-note-content">
+                                                <div class="hs-crm-note-text"><?php echo esc_html($note->note); ?></div>
+                                            </td>
+                                            <td class="hs-crm-note-date">
+                                                <?php echo esc_html(date('d/m/Y H:i', strtotime($note->created_at))); ?>
+                                            </td>
+                                            <td colspan="2" class="hs-crm-note-actions">
+                                                <button type="button" class="button button-small hs-crm-delete-note" data-note-id="<?php echo esc_attr($note->id); ?>">Delete</button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                                
+                                <!-- Add note row -->
+                                <tr class="hs-crm-add-note-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                    <td colspan="5">
+                                        <textarea class="hs-crm-new-note" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" rows="2" placeholder="Add a new note..."></textarea>
+                                    </td>
                                     <td>
-                                        <textarea class="hs-crm-admin-notes" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" rows="2" placeholder="Add notes..."><?php echo esc_textarea($enquiry->admin_notes); ?></textarea>
-                                        <button type="button" class="button button-small hs-crm-save-notes" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">Save</button>
+                                        <button type="button" class="button button-small hs-crm-add-note" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">Add Note</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -306,6 +335,61 @@ class HS_CRM_Admin {
             wp_send_json_success(array('enquiry' => $enquiry));
         } else {
             wp_send_json_error(array('message' => 'Enquiry not found.'));
+        }
+    }
+    
+    /**
+     * AJAX handler for adding a note
+     */
+    public function ajax_add_note() {
+        check_ajax_referer('hs_crm_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Permission denied.'));
+        }
+        
+        $enquiry_id = isset($_POST['enquiry_id']) ? intval($_POST['enquiry_id']) : 0;
+        $note = isset($_POST['note']) ? sanitize_textarea_field($_POST['note']) : '';
+        
+        if (!$enquiry_id || empty($note)) {
+            wp_send_json_error(array('message' => 'Invalid data.'));
+        }
+        
+        $note_id = HS_CRM_Database::add_note($enquiry_id, $note);
+        
+        if ($note_id) {
+            wp_send_json_success(array(
+                'message' => 'Note added successfully.',
+                'note_id' => $note_id,
+                'created_at' => current_time('mysql')
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Failed to add note.'));
+        }
+    }
+    
+    /**
+     * AJAX handler for deleting a note
+     */
+    public function ajax_delete_note() {
+        check_ajax_referer('hs_crm_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Permission denied.'));
+        }
+        
+        $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
+        
+        if (!$note_id) {
+            wp_send_json_error(array('message' => 'Invalid note ID.'));
+        }
+        
+        $result = HS_CRM_Database::delete_note($note_id);
+        
+        if ($result) {
+            wp_send_json_success(array('message' => 'Note deleted successfully.'));
+        } else {
+            wp_send_json_error(array('message' => 'Failed to delete note.'));
         }
     }
 }

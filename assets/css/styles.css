@@ -144,11 +144,73 @@
 
 .hs-crm-enquiries-table {
     margin-top: 0;
+    border-collapse: collapse;
 }
 
 .hs-crm-enquiries-table th {
     background: #f9f9f9;
     font-weight: 600;
+}
+
+/* Alternating row backgrounds */
+.hs-crm-even-row {
+    background: #f9f9f9;
+}
+
+.hs-crm-odd-row {
+    background: #fff;
+}
+
+.hs-crm-enquiry-row td {
+    padding: 12px 8px !important;
+    border-bottom: none !important;
+}
+
+.hs-crm-note-row td {
+    padding: 8px !important;
+    border-top: 1px solid #e0e0e0 !important;
+    border-bottom: none !important;
+    font-size: 13px;
+}
+
+.hs-crm-note-content {
+    padding-left: 20px !important;
+}
+
+.hs-crm-note-text {
+    color: #555;
+    font-style: italic;
+}
+
+.hs-crm-note-date {
+    color: #666;
+    font-size: 12px;
+}
+
+.hs-crm-note-actions {
+    text-align: right;
+}
+
+.hs-crm-add-note-row td {
+    padding: 8px !important;
+    border-top: 1px solid #e0e0e0 !important;
+    border-bottom: 2px solid #ccc !important;
+}
+
+.hs-crm-new-note {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.hs-crm-add-note,
+.hs-crm-delete-note {
+    font-size: 12px;
+    padding: 4px 12px;
 }
 
 .hs-crm-status-badge {

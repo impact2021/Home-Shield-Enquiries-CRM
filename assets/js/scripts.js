@@ -104,13 +104,8 @@ jQuery(document).ready(function($) {
                         // Add the note row if note data is returned
                         if (response.data.note) {
                             var note = response.data.note;
-                            // Parse the MySQL datetime format (YYYY-MM-DD HH:MM:SS)
-                            var noteDate = new Date(note.created_at ? note.created_at.replace(' ', 'T') : new Date());
-                            var formattedDate = ('0' + noteDate.getDate()).slice(-2) + '/' + 
-                                              ('0' + (noteDate.getMonth() + 1)).slice(-2) + '/' + 
-                                              noteDate.getFullYear() + ' ' +
-                                              ('0' + noteDate.getHours()).slice(-2) + ':' + 
-                                              ('0' + noteDate.getMinutes()).slice(-2);
+                            // Use the server-provided formatted date (already in Auckland timezone)
+                            var formattedDate = note.formatted_date || '';
                             
                             // Get the row class from the current enquiry row with fallback
                             var rowClasses = $row.attr('class');

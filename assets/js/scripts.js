@@ -104,18 +104,20 @@ jQuery(document).ready(function($) {
                         // Add the note row if note data is returned
                         if (response.data.note) {
                             var note = response.data.note;
-                            var noteDate = new Date(note.created_at.replace(/-/g, '/'));
+                            // Parse the MySQL datetime format (YYYY-MM-DD HH:MM:SS)
+                            var noteDate = new Date(note.created_at.replace(' ', 'T'));
                             var formattedDate = ('0' + noteDate.getDate()).slice(-2) + '/' + 
                                               ('0' + (noteDate.getMonth() + 1)).slice(-2) + '/' + 
                                               noteDate.getFullYear() + ' ' +
                                               ('0' + noteDate.getHours()).slice(-2) + ':' + 
                                               ('0' + noteDate.getMinutes()).slice(-2);
                             
-                            // Get the row class from the current enquiry row
-                            var rowClass = $row.attr('class').match(/hs-crm-(even|odd)-row/)[0];
+                            // Get the row class from the current enquiry row with fallback
+                            var rowClassMatch = $row.attr('class').match(/hs-crm-(even|odd)-row/);
+                            var rowClass = rowClassMatch ? rowClassMatch[0] : 'hs-crm-even-row';
                             
-                            // Find the add note row for this enquiry
-                            var $addNoteRow = $row.closest('tbody').find('.hs-crm-add-note-row');
+                            // Find the add note row for this specific enquiry using enquiry-id
+                            var $addNoteRow = $row.closest('tbody').find('.hs-crm-add-note-row[data-enquiry-id="' + enquiryId + '"]');
                             
                             // Create the new note row HTML
                             var $noteRow = $('<tr class="hs-crm-note-row ' + rowClass + '" data-note-id="' + note.id + '" data-enquiry-id="' + enquiryId + '">' +

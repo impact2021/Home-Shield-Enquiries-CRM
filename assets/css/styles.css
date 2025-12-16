@@ -138,7 +138,6 @@
 .hs-crm-single-enquiry-table {
     margin-bottom: 20px;
     border-collapse: collapse;
-    border: none !important;
 }
 
 .hs-crm-single-enquiry-table thead {
@@ -168,13 +167,11 @@
 }
 
 .hs-crm-enquiry-row td:first-child {
-    border-top-left-radius: 15px;
     padding-left: 12px !important;
     border-left: 1px solid #ddd !important;
 }
 
 .hs-crm-enquiry-row td:last-child {
-    border-top-right-radius: 15px;
     padding-right: 12px !important;
     border-right: 1px solid #ddd !important;
 }
@@ -228,13 +225,11 @@
 
 /* Add rounded corners to bottom of customer section */
 .hs-crm-add-note-row td:first-child {
-    border-bottom-left-radius: 15px;
     padding-left: 12px !important;
     border-left: 1px solid #ddd !important;
 }
 
 .hs-crm-add-note-row td:last-child {
-    border-bottom-right-radius: 15px;
     padding-right: 12px !important;
     border-right: 1px solid #ddd !important;
 }
@@ -256,26 +251,16 @@
 }
 
 .hs-crm-customer-header-row th:first-child {
-    border-top-left-radius: 15px;
     padding-left: 12px !important;
 }
 
 .hs-crm-customer-header-row th:last-child {
-    border-top-right-radius: 15px;
     padding-right: 12px !important;
 }
 
-/* Update main enquiry row to not have top border/radius when preceded by header */
+/* Update main enquiry row to not have top border when preceded by header */
 .hs-crm-customer-header-row + .hs-crm-enquiry-row {
     border-top: none !important;
-}
-
-.hs-crm-customer-header-row + .hs-crm-enquiry-row td:first-child {
-    border-top-left-radius: 0 !important;
-}
-
-.hs-crm-customer-header-row + .hs-crm-enquiry-row td:last-child {
-    border-top-right-radius: 0 !important;
 }
 
 .hs-crm-new-note {

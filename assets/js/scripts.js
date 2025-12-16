@@ -101,6 +101,40 @@ jQuery(document).ready(function($) {
                         $select.data('current-status', newStatus);
                         $select.val('');
                         
+                        // Add the note row if note data is returned
+                        if (response.data.note) {
+                            var note = response.data.note;
+                            // Parse the MySQL datetime format (YYYY-MM-DD HH:MM:SS)
+                            var noteDate = new Date(note.created_at ? note.created_at.replace(' ', 'T') : new Date());
+                            var formattedDate = ('0' + noteDate.getDate()).slice(-2) + '/' + 
+                                              ('0' + (noteDate.getMonth() + 1)).slice(-2) + '/' + 
+                                              noteDate.getFullYear() + ' ' +
+                                              ('0' + noteDate.getHours()).slice(-2) + ':' + 
+                                              ('0' + noteDate.getMinutes()).slice(-2);
+                            
+                            // Get the row class from the current enquiry row with fallback
+                            var rowClasses = $row.attr('class');
+                            var rowClassMatch = rowClasses ? rowClasses.match(/hs-crm-(even|odd)-row/) : null;
+                            var rowClass = rowClassMatch ? rowClassMatch[0] : 'hs-crm-even-row';
+                            
+                            // Find the add note row for this specific enquiry using enquiry-id
+                            var $addNoteRow = $row.closest('tbody').find('.hs-crm-add-note-row[data-enquiry-id="' + enquiryId + '"]');
+                            
+                            // Create the new note row HTML
+                            var $noteRow = $('<tr class="hs-crm-note-row ' + rowClass + '" data-note-id="' + note.id + '" data-enquiry-id="' + enquiryId + '">' +
+                                '<td class="hs-crm-note-date">' + formattedDate + '</td>' +
+                                '<td colspan="3" class="hs-crm-note-content">' +
+                                    '<div class="hs-crm-note-text">' + $('<div>').text(note.text).html() + '</div>' +
+                                '</td>' +
+                                '<td colspan="2" class="hs-crm-note-actions">' +
+                                    '<button type="button" class="button button-small hs-crm-delete-note" data-note-id="' + note.id + '">Delete</button>' +
+                                '</td>' +
+                            '</tr>');
+                            
+                            // Insert the note row before the add note row
+                            $noteRow.insertBefore($addNoteRow).hide().fadeIn(300);
+                        }
+                        
                         alert(response.data.message);
                     } else {
                         alert('Error: ' + response.data.message);

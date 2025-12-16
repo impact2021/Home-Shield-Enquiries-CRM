@@ -36,6 +36,7 @@ class HS_CRM_Settings {
      */
     public function register_settings() {
         register_setting('hs_crm_settings', 'hs_crm_google_api_key');
+        register_setting('hs_crm_settings', 'hs_crm_timezone');
     }
     
     /**
@@ -82,6 +83,39 @@ class HS_CRM_Settings {
                                 Enter your Google Maps API key to enable address autocomplete (restricted to New Zealand).<br>
                                 Get your API key from: <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">Google Maps Platform</a><br>
                                 <strong>Required APIs:</strong> Places API, Maps JavaScript API
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="hs_crm_timezone">Timezone</label>
+                        </th>
+                        <td>
+                            <select id="hs_crm_timezone" name="hs_crm_timezone" class="regular-text">
+                                <?php
+                                $saved_timezone = get_option('hs_crm_timezone', 'Pacific/Auckland');
+                                $timezones = array(
+                                    'Pacific/Auckland' => 'Pacific/Auckland (NZDT/NZST)',
+                                    'Pacific/Chatham' => 'Pacific/Chatham',
+                                    'Australia/Sydney' => 'Australia/Sydney (AEDT/AEST)',
+                                    'Australia/Melbourne' => 'Australia/Melbourne (AEDT/AEST)',
+                                    'Australia/Brisbane' => 'Australia/Brisbane (AEST)',
+                                    'Australia/Perth' => 'Australia/Perth (AWST)',
+                                    'UTC' => 'UTC',
+                                );
+                                foreach ($timezones as $value => $label) {
+                                    printf(
+                                        '<option value="%s" %s>%s</option>',
+                                        esc_attr($value),
+                                        selected($saved_timezone, $value, false),
+                                        esc_html($label)
+                                    );
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                Select the timezone to use for displaying dates and times in the admin dashboard.<br>
+                                This setting overrides the WordPress timezone setting for this plugin only.
                             </p>
                         </td>
                     </tr>

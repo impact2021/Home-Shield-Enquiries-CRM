@@ -122,9 +122,17 @@ jQuery(document).ready(function($) {
         var $modal = $('#hs-crm-email-modal');
         
         function showEmailModal(enquiry) {
+            var firstName = enquiry.first_name || 'Customer';
+            var fullName = (enquiry.first_name + ' ' + enquiry.last_name).trim() || enquiry.name;
+            
             $('#email-enquiry-id').val(enquiry.id);
             $('#email-to').val(enquiry.email);
-            $('#email-customer').val(enquiry.name + ' - ' + enquiry.phone);
+            $('#email-customer').val(fullName + ' - ' + enquiry.phone);
+            $('#email-customer-name').val(firstName);
+            
+            // Set default message with customer's first name
+            var defaultMessage = 'Dear ' + firstName + ',\n\nThank you for your enquiry. Please find our quote below:';
+            $('#email-message').val(defaultMessage);
             
             // Reset quote table to one row
             $('#quote-items-body').html(getQuoteItemRowHtml());
@@ -235,6 +243,45 @@ jQuery(document).ready(function($) {
                 },
                 error: function() {
                     alert('An error occurred while sending the email.');
+                }
+            });
+        });
+        
+        // Handle notes save
+        $('.hs-crm-save-notes').on('click', function() {
+            var $button = $(this);
+            var enquiryId = $button.data('enquiry-id');
+            var $textarea = $('.hs-crm-admin-notes[data-enquiry-id="' + enquiryId + '"]');
+            var notes = $textarea.val();
+            
+            $button.prop('disabled', true).text('Saving...');
+            
+            $.ajax({
+                url: hsCrmAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'hs_crm_save_notes',
+                    nonce: hsCrmAjax.nonce,
+                    enquiry_id: enquiryId,
+                    notes: notes
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $button.text('Saved!');
+                        setTimeout(function() {
+                            $button.text('Save');
+                        }, 2000);
+                    } else {
+                        alert('Error: ' + response.data.message);
+                        $button.text('Save');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while saving notes.');
+                    $button.text('Save');
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
                 }
             });
         });

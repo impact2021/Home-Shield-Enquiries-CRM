@@ -42,8 +42,13 @@ class HS_CRM_Form {
                 <div class="hs-crm-form-messages"></div>
                 
                 <div class="hs-crm-form-group">
-                    <label for="hs_name">Name <span class="required">*</span></label>
-                    <input type="text" id="hs_name" name="name" required>
+                    <label for="hs_first_name">First Name <span class="required">*</span></label>
+                    <input type="text" id="hs_first_name" name="first_name" required>
+                </div>
+                
+                <div class="hs-crm-form-group">
+                    <label for="hs_last_name">Last Name <span class="required">*</span></label>
+                    <input type="text" id="hs_last_name" name="last_name" required>
                 </div>
                 
                 <div class="hs-crm-form-group">
@@ -93,7 +98,7 @@ class HS_CRM_Form {
         }
         
         // Validate required fields
-        $required_fields = array('name', 'email', 'phone', 'address', 'job_type');
+        $required_fields = array('first_name', 'last_name', 'email', 'phone', 'address', 'job_type');
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
                 wp_send_json_error(array('message' => 'Please fill in all required fields.'));
@@ -107,7 +112,8 @@ class HS_CRM_Form {
         
         // Prepare data
         $data = array(
-            'name' => sanitize_text_field($_POST['name']),
+            'first_name' => sanitize_text_field($_POST['first_name']),
+            'last_name' => sanitize_text_field($_POST['last_name']),
             'email' => sanitize_email($_POST['email']),
             'phone' => sanitize_text_field($_POST['phone']),
             'address' => sanitize_textarea_field($_POST['address']),

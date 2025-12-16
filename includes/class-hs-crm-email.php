@@ -55,6 +55,8 @@ class HS_CRM_Email {
         $result = wp_mail($to, $subject, $email_content, $headers);
         
         if ($result) {
+            // Mark email as sent
+            HS_CRM_Database::mark_email_sent($enquiry_id);
             wp_send_json_success(array('message' => 'Email sent successfully.'));
         } else {
             wp_send_json_error(array('message' => 'Failed to send email.'));
@@ -145,8 +147,8 @@ class HS_CRM_Email {
         $html .= '<p>' . nl2br(esc_html($message)) . '</p>';
         $html .= '</div>';
         
-        // Quote table
-        if ($quote_html) {
+        // Quote table - ensure it's always included if provided
+        if (!empty($quote_html)) {
             $html .= '<div style="padding: 20px;">';
             $html .= '<h2>Quote Details</h2>';
             $html .= $quote_html;
@@ -156,7 +158,7 @@ class HS_CRM_Email {
         // Job details
         $html .= '<div style="padding: 20px; background-color: #f9f9f9; margin-top: 20px;">';
         $html .= '<h3>Job Details</h3>';
-        $html .= '<p><strong>Name:</strong> ' . esc_html($enquiry->name) . '</p>';
+        $html .= '<p><strong>Name:</strong> ' . esc_html($enquiry->first_name . ' ' . $enquiry->last_name) . '</p>';
         $html .= '<p><strong>Email:</strong> ' . esc_html($enquiry->email) . '</p>';
         $html .= '<p><strong>Address:</strong> ' . esc_html($enquiry->address) . '</p>';
         $html .= '<p><strong>Phone:</strong> ' . esc_html($enquiry->phone) . '</p>';

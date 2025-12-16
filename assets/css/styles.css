@@ -161,31 +161,45 @@
     background: #fff;
 }
 
+/* Add visible border and spacing to customer groups */
 .hs-crm-enquiry-row td {
     padding: 12px 8px !important;
     border-bottom: none !important;
+    border-left: 1px solid #ddd !important;
+    border-right: 1px solid #ddd !important;
 }
 
-/* Add spacing and rounded corners to enquiry groups */
 .hs-crm-enquiry-row td:first-child {
-    border-top-left-radius: 8px;
+    border-top-left-radius: 15px;
     padding-left: 12px !important;
+    border-left: 1px solid #ddd !important;
 }
 
 .hs-crm-enquiry-row td:last-child {
-    border-top-right-radius: 8px;
+    border-top-right-radius: 15px;
     padding-right: 12px !important;
+    border-right: 1px solid #ddd !important;
 }
 
 .hs-crm-enquiry-row {
-    border-top: 12px solid transparent;
+    border-top: 1px solid #ddd !important;
 }
 
 .hs-crm-note-row td {
     padding: 8px !important;
     border-top: 1px solid #e0e0e0 !important;
     border-bottom: none !important;
+    border-left: 1px solid #ddd !important;
+    border-right: 1px solid #ddd !important;
     font-size: 13px;
+}
+
+.hs-crm-note-row td:first-child {
+    border-left: 1px solid #ddd !important;
+}
+
+.hs-crm-note-row td:last-child {
+    border-right: 1px solid #ddd !important;
 }
 
 .hs-crm-note-content {
@@ -209,22 +223,69 @@
 .hs-crm-add-note-row td {
     padding: 8px !important;
     border-top: 1px solid #e0e0e0 !important;
-    border-bottom: none !important;
+    border-left: 1px solid #ddd !important;
+    border-right: 1px solid #ddd !important;
+    border-bottom: 1px solid #ddd !important;
 }
 
 /* Add rounded corners to bottom of customer section */
 .hs-crm-add-note-row td:first-child {
-    border-bottom-left-radius: 8px;
+    border-bottom-left-radius: 15px;
     padding-left: 12px !important;
+    border-left: 1px solid #ddd !important;
 }
 
 .hs-crm-add-note-row td:last-child {
-    border-bottom-right-radius: 8px;
+    border-bottom-right-radius: 15px;
+    padding-right: 12px !important;
+    border-right: 1px solid #ddd !important;
+}
+
+/* Create 10px gap between customer enquiries */
+tbody tr.hs-crm-customer-header-row {
+    border-top: 10px solid transparent;
+}
+
+/* Prevent double border on first customer */
+tbody tr.hs-crm-customer-header-row:first-child {
+    border-top: none;
+}
+
+/* Customer header row styling */
+.hs-crm-customer-header-row th {
+    background: #e8e8e8 !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    color: #666 !important;
+    padding: 6px 8px !important;
+    border-left: 1px solid #ddd !important;
+    border-right: 1px solid #ddd !important;
+    border-top: 1px solid #ddd !important;
+    border-bottom: none !important;
+}
+
+.hs-crm-customer-header-row th:first-child {
+    border-top-left-radius: 15px;
+    padding-left: 12px !important;
+}
+
+.hs-crm-customer-header-row th:last-child {
+    border-top-right-radius: 15px;
     padding-right: 12px !important;
 }
 
-.hs-crm-add-note-row {
-    border-bottom: 12px solid transparent;
+/* Update main enquiry row to not have top border/radius when preceded by header */
+.hs-crm-customer-header-row + .hs-crm-enquiry-row {
+    border-top: none !important;
+}
+
+.hs-crm-customer-header-row + .hs-crm-enquiry-row td:first-child {
+    border-top-left-radius: 0 !important;
+}
+
+.hs-crm-customer-header-row + .hs-crm-enquiry-row td:last-child {
+    border-top-right-radius: 0 !important;
 }
 
 .hs-crm-new-note {
@@ -272,7 +333,8 @@
     color: #388e3c;
 }
 
-.status-dead {
+.status-dead,
+.status-archived {
     background: #ffebee;
     color: #c62828;
 }

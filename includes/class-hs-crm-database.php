@@ -94,7 +94,13 @@ class HS_CRM_Database {
         
         $table_name = $wpdb->prefix . 'hs_enquiries';
         
-        if ($status && $status !== 'all') {
+        if ($status === 'active') {
+            // Active leads: Not Actioned, Emailed, or Quoted
+            $sql = "SELECT * FROM $table_name WHERE status IN ('Not Actioned', 'Emailed', 'Quoted') ORDER BY created_at DESC";
+        } elseif ($status === 'Archived') {
+            // Show both "Archived" and "Dead" (for backward compatibility)
+            $sql = "SELECT * FROM $table_name WHERE status IN ('Archived', 'Dead') ORDER BY created_at DESC";
+        } elseif ($status && $status !== 'all') {
             $sql = $wpdb->prepare(
                 "SELECT * FROM $table_name WHERE status = %s ORDER BY created_at DESC",
                 $status
@@ -153,16 +159,30 @@ class HS_CRM_Database {
         
         $counts = array(
             'all' => 0,
+            'active' => 0,
             'Not Actioned' => 0,
             'Emailed' => 0,
             'Quoted' => 0,
             'Completed' => 0,
-            'Dead' => 0
+            'Archived' => 0
         );
         
         foreach ($results as $row) {
-            $counts[$row->status] = $row->count;
+            // Map old "Dead" status to "Archived" for display
+            if ($row->status === 'Dead') {
+                $counts['Archived'] += $row->count;
+            } else {
+                if (!isset($counts[$row->status])) {
+                    $counts[$row->status] = 0;
+                }
+                $counts[$row->status] += $row->count;
+            }
             $counts['all'] += $row->count;
+            
+            // Count active leads (Not Actioned, Emailed, Quoted)
+            if (in_array($row->status, array('Not Actioned', 'Emailed', 'Quoted'))) {
+                $counts['active'] += $row->count;
+            }
         }
         
         return $counts;

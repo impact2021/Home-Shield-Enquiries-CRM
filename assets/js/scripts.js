@@ -156,8 +156,10 @@ jQuery(document).ready(function($) {
         
         function showEmailModal(enquiry, emailType) {
             // Try to get first name, fall back to full name, then to generic greeting
-            var firstName = enquiry.first_name || (enquiry.name ? enquiry.name.split(' ')[0] : '');
-            var fullName = (enquiry.first_name + ' ' + enquiry.last_name).trim() || enquiry.name;
+            var firstName = (enquiry.first_name != null && enquiry.first_name !== '') 
+                ? enquiry.first_name 
+                : (enquiry.name ? enquiry.name.split(' ')[0] : '');
+            var fullName = ((enquiry.first_name || '') + ' ' + (enquiry.last_name || '')).trim() || enquiry.name || '';
             
             $('#email-enquiry-id').val(enquiry.id);
             $('#email-to').val(enquiry.email);

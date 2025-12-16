@@ -123,7 +123,7 @@ function hs_crm_migrate_to_1_1_0() {
             last_name = IF(
                 SUBSTRING_INDEX(name, ' ', 1) = SUBSTRING_INDEX(name, ' ', -1),
                 '',
-                SUBSTRING_INDEX(name, ' ', -1)
+                TRIM(SUBSTRING(name, LOCATE(' ', name) + 1))
             )
         WHERE first_name = '' AND name != ''
     ");

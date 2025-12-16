@@ -122,7 +122,8 @@ jQuery(document).ready(function($) {
         var $modal = $('#hs-crm-email-modal');
         
         function showEmailModal(enquiry) {
-            var firstName = enquiry.first_name || 'Customer';
+            // Try to get first name, fall back to full name, then to generic greeting
+            var firstName = enquiry.first_name || (enquiry.name ? enquiry.name.split(' ')[0] : '');
             var fullName = (enquiry.first_name + ' ' + enquiry.last_name).trim() || enquiry.name;
             
             $('#email-enquiry-id').val(enquiry.id);
@@ -130,8 +131,9 @@ jQuery(document).ready(function($) {
             $('#email-customer').val(fullName + ' - ' + enquiry.phone);
             $('#email-customer-name').val(firstName);
             
-            // Set default message with customer's first name
-            var defaultMessage = 'Dear ' + firstName + ',\n\nThank you for your enquiry. Please find our quote below:';
+            // Set default message with customer's first name or generic greeting
+            var greeting = firstName ? 'Dear ' + firstName : 'Dear Customer';
+            var defaultMessage = greeting + ',\n\nThank you for your enquiry. Please find our quote below:';
             $('#email-message').val(defaultMessage);
             
             // Reset quote table to one row

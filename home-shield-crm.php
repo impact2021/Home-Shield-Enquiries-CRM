@@ -120,7 +120,11 @@ function hs_crm_migrate_to_1_1_0() {
     $wpdb->query("
         UPDATE $table_name 
         SET first_name = SUBSTRING_INDEX(name, ' ', 1),
-            last_name = SUBSTRING_INDEX(name, ' ', -1)
+            last_name = IF(
+                SUBSTRING_INDEX(name, ' ', 1) = SUBSTRING_INDEX(name, ' ', -1),
+                '',
+                SUBSTRING_INDEX(name, ' ', -1)
+            )
         WHERE first_name = '' AND name != ''
     ");
 }

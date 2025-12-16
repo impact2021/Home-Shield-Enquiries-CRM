@@ -15,6 +15,8 @@ class HS_CRM_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('wp_ajax_hs_crm_update_status', array($this, 'ajax_update_status'));
+        add_action('wp_ajax_hs_crm_save_notes', array($this, 'ajax_save_notes'));
+        add_action('wp_ajax_hs_crm_get_enquiry', array($this, 'ajax_get_enquiry'));
     }
     
     /**
@@ -80,15 +82,15 @@ class HS_CRM_Admin {
                 <table class="wp-list-table widefat fixed striped hs-crm-enquiries-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Address</th>
-                            <th>Job Type</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th style="width: 13%;">Name</th>
+                            <th style="width: 9%;">Phone</th>
+                            <th style="width: 13%;">Address</th>
+                            <th style="width: 10%;">Job Type</th>
+                            <th style="width: 9%;">Status</th>
+                            <th style="width: 7%;">Created</th>
+                            <th style="width: 9%;">Status Change</th>
+                            <th style="width: 12%;">Action</th>
+                            <th style="width: 18%;">Notes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,9 +101,10 @@ class HS_CRM_Admin {
                         <?php else: ?>
                             <?php foreach ($enquiries as $enquiry): ?>
                                 <tr data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                    <td><?php echo esc_html($enquiry->id); ?></td>
-                                    <td><?php echo esc_html($enquiry->name); ?></td>
-                                    <td><?php echo esc_html($enquiry->email); ?></td>
+                                    <td>
+                                        <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
+                                        <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small>
+                                    </td>
                                     <td><?php echo esc_html($enquiry->phone); ?></td>
                                     <td><?php echo esc_html($enquiry->address); ?></td>
                                     <td><?php echo esc_html($job_types[$enquiry->job_type] ?? $enquiry->job_type); ?></td>
@@ -110,7 +113,7 @@ class HS_CRM_Admin {
                                             <?php echo esc_html($enquiry->status); ?>
                                         </span>
                                     </td>
-                                    <td><?php echo esc_html(date('Y-m-d H:i', strtotime($enquiry->created_at))); ?></td>
+                                    <td><?php echo esc_html(date('d/m/Y', strtotime($enquiry->created_at))); ?></td>
                                     <td>
                                         <select class="hs-crm-status-select" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" data-current-status="<?php echo esc_attr($enquiry->status); ?>">
                                             <option value="">Change Status...</option>
@@ -120,6 +123,18 @@ class HS_CRM_Admin {
                                             <option value="Completed">Completed</option>
                                             <option value="Dead">Dead</option>
                                         </select>
+                                    </td>
+                                    <td>
+                                        <select class="hs-crm-action-select" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                            <option value="">Select Action...</option>
+                                            <option value="send_quote">Send Quote</option>
+                                            <option value="send_invoice">Send Invoice</option>
+                                            <option value="send_receipt">Send Receipt</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <textarea class="hs-crm-admin-notes" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" rows="2" placeholder="Add notes..."><?php echo esc_textarea($enquiry->admin_notes); ?></textarea>
+                                        <button type="button" class="button button-small hs-crm-save-notes" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">Save</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -133,9 +148,10 @@ class HS_CRM_Admin {
         <div id="hs-crm-email-modal" class="hs-crm-modal" style="display: none;">
             <div class="hs-crm-modal-content">
                 <span class="hs-crm-modal-close">&times;</span>
-                <h2>Send Quote Email</h2>
+                <h2 id="email-modal-title">Send Email</h2>
                 <form id="hs-crm-email-form">
                     <input type="hidden" id="email-enquiry-id" name="enquiry_id">
+                    <input type="hidden" id="email-type" name="email_type">
                     
                     <div class="hs-crm-form-group">
                         <label for="email-to">To:</label>
@@ -149,15 +165,15 @@ class HS_CRM_Admin {
                     
                     <div class="hs-crm-form-group">
                         <label for="email-subject">Subject:</label>
-                        <input type="text" id="email-subject" name="subject" value="Quote for Painting Services">
+                        <input type="text" id="email-subject" name="subject">
                     </div>
                     
                     <div class="hs-crm-form-group">
                         <label for="email-message">Message:</label>
-                        <textarea id="email-message" name="message" rows="5">Dear Customer,
-
-Thank you for your enquiry. Please find our quote below:</textarea>
+                        <textarea id="email-message" name="message" rows="5"></textarea>
                     </div>
+                    
+                    <input type="hidden" id="email-customer-name" name="customer_first_name">
                     
                     <div class="hs-crm-form-group">
                         <label>Quote Items:</label>
@@ -237,24 +253,62 @@ Thank you for your enquiry. Please find our quote below:</textarea>
         $result = HS_CRM_Database::update_status($enquiry_id, $new_status);
         
         if ($result) {
-            // Check if we need to trigger email (status change to Emailed, Quoted, or Completed)
-            $trigger_email = in_array($new_status, array('Emailed', 'Quoted', 'Completed'));
-            
-            if ($trigger_email) {
-                $enquiry = HS_CRM_Database::get_enquiry($enquiry_id);
-                wp_send_json_success(array(
-                    'message' => 'Status updated successfully.',
-                    'trigger_email' => true,
-                    'enquiry' => $enquiry
-                ));
-            } else {
-                wp_send_json_success(array(
-                    'message' => 'Status updated successfully.',
-                    'trigger_email' => false
-                ));
-            }
+            wp_send_json_success(array(
+                'message' => 'Status updated successfully.'
+            ));
         } else {
             wp_send_json_error(array('message' => 'Failed to update status.'));
+        }
+    }
+    
+    /**
+     * AJAX handler for saving notes
+     */
+    public function ajax_save_notes() {
+        check_ajax_referer('hs_crm_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Permission denied.'));
+        }
+        
+        $enquiry_id = isset($_POST['enquiry_id']) ? intval($_POST['enquiry_id']) : 0;
+        $notes = isset($_POST['notes']) ? sanitize_textarea_field($_POST['notes']) : '';
+        
+        if (!$enquiry_id) {
+            wp_send_json_error(array('message' => 'Invalid enquiry ID.'));
+        }
+        
+        $result = HS_CRM_Database::update_admin_notes($enquiry_id, $notes);
+        
+        if ($result) {
+            wp_send_json_success(array('message' => 'Notes saved successfully.'));
+        } else {
+            wp_send_json_error(array('message' => 'Failed to save notes.'));
+        }
+    }
+    
+    /**
+     * AJAX handler for getting enquiry data
+     */
+    public function ajax_get_enquiry() {
+        check_ajax_referer('hs_crm_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Permission denied.'));
+        }
+        
+        $enquiry_id = isset($_POST['enquiry_id']) ? intval($_POST['enquiry_id']) : 0;
+        
+        if (!$enquiry_id) {
+            wp_send_json_error(array('message' => 'Invalid enquiry ID.'));
+        }
+        
+        $enquiry = HS_CRM_Database::get_enquiry($enquiry_id);
+        
+        if ($enquiry) {
+            wp_send_json_success(array('enquiry' => $enquiry));
+        } else {
+            wp_send_json_error(array('message' => 'Enquiry not found.'));
         }
     }
 }

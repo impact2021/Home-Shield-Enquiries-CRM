@@ -20,12 +20,16 @@ class HS_CRM_Database {
         
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
-            name varchar(255) NOT NULL,
+            first_name varchar(255) NOT NULL,
+            last_name varchar(255) NOT NULL,
+            name varchar(255) NOT NULL DEFAULT '',
             email varchar(255) NOT NULL,
             phone varchar(50) NOT NULL,
             address text NOT NULL,
             job_type varchar(100) NOT NULL,
             status varchar(50) DEFAULT 'Not Actioned' NOT NULL,
+            email_sent tinyint(1) DEFAULT 0 NOT NULL,
+            admin_notes text DEFAULT '' NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
             PRIMARY KEY  (id),
@@ -45,17 +49,25 @@ class HS_CRM_Database {
         
         $table_name = $wpdb->prefix . 'hs_enquiries';
         
+        $first_name = sanitize_text_field($data['first_name']);
+        $last_name = sanitize_text_field($data['last_name']);
+        $full_name = trim($first_name . ' ' . $last_name);
+        
         $result = $wpdb->insert(
             $table_name,
             array(
-                'name' => sanitize_text_field($data['name']),
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'name' => $full_name,
                 'email' => sanitize_email($data['email']),
                 'phone' => sanitize_text_field($data['phone']),
                 'address' => sanitize_textarea_field($data['address']),
                 'job_type' => sanitize_text_field($data['job_type']),
-                'status' => 'Not Actioned'
+                'status' => 'Not Actioned',
+                'email_sent' => 0,
+                'admin_notes' => ''
             ),
-            array('%s', '%s', '%s', '%s', '%s', '%s')
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s')
         );
         
         return $result !== false ? $wpdb->insert_id : false;
@@ -141,5 +153,43 @@ class HS_CRM_Database {
         }
         
         return $counts;
+    }
+    
+    /**
+     * Update admin notes
+     */
+    public static function update_admin_notes($id, $notes) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'hs_enquiries';
+        
+        $result = $wpdb->update(
+            $table_name,
+            array('admin_notes' => sanitize_textarea_field($notes)),
+            array('id' => $id),
+            array('%s'),
+            array('%d')
+        );
+        
+        return $result !== false;
+    }
+    
+    /**
+     * Mark email as sent
+     */
+    public static function mark_email_sent($id) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'hs_enquiries';
+        
+        $result = $wpdb->update(
+            $table_name,
+            array('email_sent' => 1),
+            array('id' => $id),
+            array('%d'),
+            array('%d')
+        );
+        
+        return $result !== false;
     }
 }

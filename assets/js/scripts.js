@@ -102,12 +102,7 @@ jQuery(document).ready(function($) {
                         $select.data('current-status', newStatus);
                         $select.val('');
                         
-                        // Show email modal if needed
-                        if (response.data.trigger_email) {
-                            showEmailModal(response.data.enquiry);
-                        } else {
-                            alert(response.data.message);
-                        }
+                        alert(response.data.message);
                     } else {
                         alert('Error: ' + response.data.message);
                     }
@@ -118,13 +113,89 @@ jQuery(document).ready(function($) {
             });
         });
         
+        // Handle action dropdown (send quote/invoice/receipt)
+        $('.hs-crm-action-select').on('change', function() {
+            var $select = $(this);
+            var enquiryId = $select.data('enquiry-id');
+            var actionType = $select.val();
+            
+            if (!actionType) {
+                return;
+            }
+            
+            // Get enquiry data from the row
+            var $row = $select.closest('tr');
+            
+            // Fetch full enquiry data via AJAX
+            $.ajax({
+                url: hsCrmAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'hs_crm_get_enquiry',
+                    nonce: hsCrmAjax.nonce,
+                    enquiry_id: enquiryId
+                },
+                success: function(response) {
+                    if (response.success && response.data.enquiry) {
+                        showEmailModal(response.data.enquiry, actionType);
+                        $select.val('');
+                    } else {
+                        alert('Error: Could not load enquiry data.');
+                        $select.val('');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while loading enquiry data.');
+                    $select.val('');
+                }
+            });
+        });
+        
         // Email modal functionality
         var $modal = $('#hs-crm-email-modal');
         
-        function showEmailModal(enquiry) {
+        function showEmailModal(enquiry, emailType) {
+            // Try to get first name, fall back to full name, then to generic greeting
+            var firstName = (enquiry.first_name != null && enquiry.first_name !== '') 
+                ? enquiry.first_name 
+                : (enquiry.name ? enquiry.name.split(' ')[0] : '');
+            var fullName = ((enquiry.first_name || '') + ' ' + (enquiry.last_name || '')).trim() || enquiry.name || '';
+            
             $('#email-enquiry-id').val(enquiry.id);
             $('#email-to').val(enquiry.email);
-            $('#email-customer').val(enquiry.name + ' - ' + enquiry.phone);
+            $('#email-customer').val(fullName + ' - ' + enquiry.phone);
+            $('#email-customer-name').val(firstName);
+            $('#email-type').val(emailType);
+            
+            // Set title, subject and message based on email type
+            var greeting = firstName ? 'Dear ' + firstName : 'Dear Customer';
+            var title, subject, message;
+            
+            switch(emailType) {
+                case 'send_quote':
+                    title = 'Send Quote';
+                    subject = 'Quote for Painting Services';
+                    message = greeting + ',\n\nThank you for your enquiry. Please find our quote below:';
+                    break;
+                case 'send_invoice':
+                    title = 'Send Invoice';
+                    subject = 'Invoice for Painting Services';
+                    message = greeting + ',\n\nThank you for your business. Please find your invoice below:';
+                    break;
+                case 'send_receipt':
+                    title = 'Send Receipt';
+                    subject = 'Receipt for Painting Services';
+                    message = greeting + ',\n\nThank you for your payment. Please find your receipt below:';
+                    break;
+                default:
+                    title = 'Send Email';
+                    subject = 'Home Shield Painters';
+                    message = greeting + ',\n\n';
+            }
+            
+            $('#email-modal-title').text(title);
+            $('#email-subject').val(subject);
+            $('#email-message').val(message);
             
             // Reset quote table to one row
             $('#quote-items-body').html(getQuoteItemRowHtml());
@@ -217,7 +288,8 @@ jQuery(document).ready(function($) {
                 enquiry_id: $('#email-enquiry-id').val(),
                 subject: $('#email-subject').val(),
                 message: $('#email-message').val(),
-                quote_items: quoteItems
+                quote_items: quoteItems,
+                email_type: $('#email-type').val()
             };
             
             $.ajax({
@@ -235,6 +307,45 @@ jQuery(document).ready(function($) {
                 },
                 error: function() {
                     alert('An error occurred while sending the email.');
+                }
+            });
+        });
+        
+        // Handle notes save
+        $('.hs-crm-save-notes').on('click', function() {
+            var $button = $(this);
+            var enquiryId = $button.data('enquiry-id');
+            var $textarea = $('.hs-crm-admin-notes[data-enquiry-id="' + enquiryId + '"]');
+            var notes = $textarea.val();
+            
+            $button.prop('disabled', true).text('Saving...');
+            
+            $.ajax({
+                url: hsCrmAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'hs_crm_save_notes',
+                    nonce: hsCrmAjax.nonce,
+                    enquiry_id: enquiryId,
+                    notes: notes
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $button.text('Saved!');
+                        setTimeout(function() {
+                            $button.text('Save');
+                        }, 2000);
+                    } else {
+                        alert('Error: ' + response.data.message);
+                        $button.text('Save');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while saving notes.');
+                    $button.text('Save');
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
                 }
             });
         });

@@ -280,7 +280,11 @@ class HS_CRM_Admin {
         
         if ($result) {
             // Add automatic note for status change
-            $note_text = sprintf('Status changed from "%s" to "%s"', $old_status, $new_status);
+            if (!empty($old_status)) {
+                $note_text = sprintf('Status changed from "%s" to "%s"', $old_status, $new_status);
+            } else {
+                $note_text = sprintf('Status changed to "%s"', $new_status);
+            }
             HS_CRM_Database::add_note($enquiry_id, $note_text);
             
             wp_send_json_success(array(

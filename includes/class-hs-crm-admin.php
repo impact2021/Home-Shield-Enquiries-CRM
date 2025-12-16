@@ -82,6 +82,7 @@ class HS_CRM_Admin {
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
+                            <th>Email</th>
                             <th>Phone</th>
                             <th>Address</th>
                             <th>Job Type</th>
@@ -93,13 +94,14 @@ class HS_CRM_Admin {
                     <tbody>
                         <?php if (empty($enquiries)): ?>
                             <tr>
-                                <td colspan="8" style="text-align: center;">No enquiries found.</td>
+                                <td colspan="9" style="text-align: center;">No enquiries found.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($enquiries as $enquiry): ?>
                                 <tr data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
                                     <td><?php echo esc_html($enquiry->id); ?></td>
                                     <td><?php echo esc_html($enquiry->name); ?></td>
+                                    <td><?php echo esc_html($enquiry->email); ?></td>
                                     <td><?php echo esc_html($enquiry->phone); ?></td>
                                     <td><?php echo esc_html($enquiry->address); ?></td>
                                     <td><?php echo esc_html($job_types[$enquiry->job_type] ?? $enquiry->job_type); ?></td>
@@ -137,7 +139,12 @@ class HS_CRM_Admin {
                     
                     <div class="hs-crm-form-group">
                         <label for="email-to">To:</label>
-                        <input type="text" id="email-to" name="email_to" readonly>
+                        <input type="email" id="email-to" name="email_to" readonly>
+                    </div>
+                    
+                    <div class="hs-crm-form-group">
+                        <label for="email-customer">Customer:</label>
+                        <input type="text" id="email-customer" name="email_customer" readonly>
                     </div>
                     
                     <div class="hs-crm-form-group">

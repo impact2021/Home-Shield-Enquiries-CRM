@@ -47,6 +47,11 @@ class HS_CRM_Form {
                 </div>
                 
                 <div class="hs-crm-form-group">
+                    <label for="hs_email">Email <span class="required">*</span></label>
+                    <input type="email" id="hs_email" name="email" required>
+                </div>
+                
+                <div class="hs-crm-form-group">
                     <label for="hs_phone">Phone Number <span class="required">*</span></label>
                     <input type="tel" id="hs_phone" name="phone" required>
                 </div>
@@ -88,16 +93,22 @@ class HS_CRM_Form {
         }
         
         // Validate required fields
-        $required_fields = array('name', 'phone', 'address', 'job_type');
+        $required_fields = array('name', 'email', 'phone', 'address', 'job_type');
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
                 wp_send_json_error(array('message' => 'Please fill in all required fields.'));
             }
         }
         
+        // Validate email format
+        if (!is_email($_POST['email'])) {
+            wp_send_json_error(array('message' => 'Please enter a valid email address.'));
+        }
+        
         // Prepare data
         $data = array(
             'name' => sanitize_text_field($_POST['name']),
+            'email' => sanitize_email($_POST['email']),
             'phone' => sanitize_text_field($_POST['phone']),
             'address' => sanitize_textarea_field($_POST['address']),
             'job_type' => sanitize_text_field($_POST['job_type'])

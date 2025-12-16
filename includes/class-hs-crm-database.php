@@ -21,6 +21,7 @@ class HS_CRM_Database {
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             name varchar(255) NOT NULL,
+            email varchar(255) NOT NULL,
             phone varchar(50) NOT NULL,
             address text NOT NULL,
             job_type varchar(100) NOT NULL,
@@ -48,12 +49,13 @@ class HS_CRM_Database {
             $table_name,
             array(
                 'name' => sanitize_text_field($data['name']),
+                'email' => sanitize_email($data['email']),
                 'phone' => sanitize_text_field($data['phone']),
                 'address' => sanitize_textarea_field($data['address']),
                 'job_type' => sanitize_text_field($data['job_type']),
                 'status' => 'Not Actioned'
             ),
-            array('%s', '%s', '%s', '%s', '%s')
+            array('%s', '%s', '%s', '%s', '%s', '%s')
         );
         
         return $result !== false ? $wpdb->insert_id : false;

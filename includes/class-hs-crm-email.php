@@ -47,9 +47,8 @@ class HS_CRM_Email {
         // Build full email content
         $email_content = $this->build_email_content($message, $quote_html, $enquiry);
         
-        // In a real implementation, you would extract email from the enquiry
-        // For now, we'll use the admin email or a custom field
-        $to = get_option('admin_email'); // In production, this should be the customer's email
+        // Send to customer email
+        $to = $enquiry->email;
         
         $headers = array('Content-Type: text/html; charset=UTF-8');
         
@@ -158,6 +157,7 @@ class HS_CRM_Email {
         $html .= '<div style="padding: 20px; background-color: #f9f9f9; margin-top: 20px;">';
         $html .= '<h3>Job Details</h3>';
         $html .= '<p><strong>Name:</strong> ' . esc_html($enquiry->name) . '</p>';
+        $html .= '<p><strong>Email:</strong> ' . esc_html($enquiry->email) . '</p>';
         $html .= '<p><strong>Address:</strong> ' . esc_html($enquiry->address) . '</p>';
         $html .= '<p><strong>Phone:</strong> ' . esc_html($enquiry->phone) . '</p>';
         $html .= '<p><strong>Job Type:</strong> ' . esc_html($enquiry->job_type) . '</p>';

@@ -123,7 +123,8 @@ jQuery(document).ready(function($) {
         
         function showEmailModal(enquiry) {
             $('#email-enquiry-id').val(enquiry.id);
-            $('#email-to').val(enquiry.name + ' (' + enquiry.phone + ')');
+            $('#email-to').val(enquiry.email);
+            $('#email-customer').val(enquiry.name + ' - ' + enquiry.phone);
             
             // Reset quote table to one row
             $('#quote-items-body').html(getQuoteItemRowHtml());

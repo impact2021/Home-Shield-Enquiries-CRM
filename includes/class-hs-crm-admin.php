@@ -384,6 +384,15 @@ class HS_CRM_Admin {
             wp_send_json_error(array('message' => 'Invalid note ID.'));
         }
         
+        // Verify the note exists before attempting to delete
+        global $wpdb;
+        $notes_table = $wpdb->prefix . 'hs_enquiry_notes';
+        $note = $wpdb->get_row($wpdb->prepare("SELECT * FROM $notes_table WHERE id = %d", $note_id));
+        
+        if (!$note) {
+            wp_send_json_error(array('message' => 'Note not found.'));
+        }
+        
         $result = HS_CRM_Database::delete_note($note_id);
         
         if ($result) {

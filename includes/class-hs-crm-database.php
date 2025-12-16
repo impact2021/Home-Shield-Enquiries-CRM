@@ -39,6 +39,19 @@ class HS_CRM_Database {
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+        
+        // Create notes table
+        $notes_table = $wpdb->prefix . 'hs_enquiry_notes';
+        $sql_notes = "CREATE TABLE IF NOT EXISTS $notes_table (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            enquiry_id mediumint(9) NOT NULL,
+            note text NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            KEY enquiry_id (enquiry_id)
+        ) $charset_collate;";
+        
+        dbDelta($sql_notes);
     }
     
     /**
@@ -62,7 +75,7 @@ class HS_CRM_Database {
                 'email' => sanitize_email($data['email']),
                 'phone' => sanitize_text_field($data['phone']),
                 'address' => sanitize_textarea_field($data['address']),
-                'job_type' => sanitize_text_field($data['job_type']),
+                'job_type' => '',
                 'status' => 'Not Actioned',
                 'email_sent' => 0,
                 'admin_notes' => ''
@@ -187,6 +200,57 @@ class HS_CRM_Database {
             array('email_sent' => 1),
             array('id' => $id),
             array('%d'),
+            array('%d')
+        );
+        
+        return $result !== false;
+    }
+    
+    /**
+     * Add a note to an enquiry
+     */
+    public static function add_note($enquiry_id, $note) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'hs_enquiry_notes';
+        
+        $result = $wpdb->insert(
+            $table_name,
+            array(
+                'enquiry_id' => $enquiry_id,
+                'note' => sanitize_textarea_field($note)
+            ),
+            array('%d', '%s')
+        );
+        
+        return $result !== false ? $wpdb->insert_id : false;
+    }
+    
+    /**
+     * Get all notes for an enquiry
+     */
+    public static function get_notes($enquiry_id) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'hs_enquiry_notes';
+        
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE enquiry_id = %d ORDER BY created_at ASC",
+            $enquiry_id
+        ));
+    }
+    
+    /**
+     * Delete a note
+     */
+    public static function delete_note($note_id) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'hs_enquiry_notes';
+        
+        $result = $wpdb->delete(
+            $table_name,
+            array('id' => $note_id),
             array('%d')
         );
         

@@ -8,8 +8,19 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+.hs-crm-form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
 .hs-crm-form-group {
     margin-bottom: 20px;
+}
+
+.hs-crm-form-half {
+    flex: 1;
+    margin-bottom: 0;
 }
 
 .hs-crm-form-group label {
@@ -24,15 +35,17 @@
 }
 
 .hs-crm-form-group input[type="text"],
+.hs-crm-form-group input[type="email"],
 .hs-crm-form-group input[type="tel"],
 .hs-crm-form-group textarea,
 .hs-crm-form-group select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 12px 15px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 14px;
     transition: border-color 0.3s;
+    box-sizing: border-box;
 }
 
 .hs-crm-form-group input:focus,
@@ -47,11 +60,12 @@
     color: #fff;
     padding: 12px 30px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.3s;
+    width: 100%;
 }
 
 .hs-crm-submit-btn:hover {
@@ -130,11 +144,73 @@
 
 .hs-crm-enquiries-table {
     margin-top: 0;
+    border-collapse: collapse;
 }
 
 .hs-crm-enquiries-table th {
     background: #f9f9f9;
     font-weight: 600;
+}
+
+/* Alternating row backgrounds */
+.hs-crm-even-row {
+    background: #f9f9f9;
+}
+
+.hs-crm-odd-row {
+    background: #fff;
+}
+
+.hs-crm-enquiry-row td {
+    padding: 12px 8px !important;
+    border-bottom: none !important;
+}
+
+.hs-crm-note-row td {
+    padding: 8px !important;
+    border-top: 1px solid #e0e0e0 !important;
+    border-bottom: none !important;
+    font-size: 13px;
+}
+
+.hs-crm-note-content {
+    padding-left: 20px !important;
+}
+
+.hs-crm-note-text {
+    color: #555;
+    font-style: italic;
+}
+
+.hs-crm-note-date {
+    color: #666;
+    font-size: 12px;
+}
+
+.hs-crm-note-actions {
+    text-align: right;
+}
+
+.hs-crm-add-note-row td {
+    padding: 8px !important;
+    border-top: 1px solid #e0e0e0 !important;
+    border-bottom: 2px solid #ccc !important;
+}
+
+.hs-crm-new-note {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.hs-crm-add-note,
+.hs-crm-delete-note {
+    font-size: 12px;
+    padding: 4px 12px;
 }
 
 .hs-crm-status-badge {
@@ -351,6 +427,15 @@
 @media (max-width: 768px) {
     .hs-crm-form-container {
         padding: 20px;
+    }
+    
+    .hs-crm-form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .hs-crm-form-half {
+        margin-bottom: 20px;
     }
     
     .hs-crm-tabs {

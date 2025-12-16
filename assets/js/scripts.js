@@ -311,7 +311,7 @@ jQuery(document).ready(function($) {
             });
         });
         
-        // Handle notes save
+        // Handle notes save (legacy support)
         $('.hs-crm-save-notes').on('click', function() {
             var $button = $(this);
             var enquiryId = $button.data('enquiry-id');
@@ -346,6 +346,81 @@ jQuery(document).ready(function($) {
                 },
                 complete: function() {
                     $button.prop('disabled', false);
+                }
+            });
+        });
+        
+        // Handle add note
+        $('.hs-crm-add-note').on('click', function() {
+            var $button = $(this);
+            var enquiryId = $button.data('enquiry-id');
+            var $textarea = $('.hs-crm-new-note[data-enquiry-id="' + enquiryId + '"]');
+            var note = $textarea.val();
+            
+            if (!note.trim()) {
+                alert('Please enter a note.');
+                return;
+            }
+            
+            $button.prop('disabled', true).text('Adding...');
+            
+            $.ajax({
+                url: hsCrmAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'hs_crm_add_note',
+                    nonce: hsCrmAjax.nonce,
+                    enquiry_id: enquiryId,
+                    note: note
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload(); // Reload to show the new note
+                    } else {
+                        alert('Error: ' + response.data.message);
+                        $button.prop('disabled', false).text('Add Note');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while adding the note.');
+                    $button.prop('disabled', false).text('Add Note');
+                }
+            });
+        });
+        
+        // Handle delete note
+        $('.hs-crm-delete-note').on('click', function() {
+            var $button = $(this);
+            var noteId = $button.data('note-id');
+            
+            if (!confirm('Are you sure you want to delete this note?')) {
+                return;
+            }
+            
+            $button.prop('disabled', true).text('Deleting...');
+            
+            $.ajax({
+                url: hsCrmAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'hs_crm_delete_note',
+                    nonce: hsCrmAjax.nonce,
+                    note_id: noteId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Remove the note row from the table
+                        $button.closest('tr').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    } else {
+                        alert('Error: ' + response.data.message);
+                        $button.prop('disabled', false).text('Delete');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while deleting the note.');
+                    $button.prop('disabled', false).text('Delete');
                 }
             });
         });

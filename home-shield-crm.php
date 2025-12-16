@@ -3,8 +3,8 @@
  * Plugin Name: Home Shield Enquiries CRM
  * Plugin URI: https://github.com/impact2021/Home-Shield-Enquiries-CRM
  * Description: A CRM system for managing painter enquiries with contact form and admin dashboard
- * Version: 1.0.0
- * Author: Home Shield
+ * Version: 1.3
+ * Author: Impact Websites
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: home-shield-crm
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('HS_CRM_VERSION', '1.0.0');
+define('HS_CRM_VERSION', '1.3');
 define('HS_CRM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HS_CRM_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -79,6 +79,12 @@ function hs_crm_check_db_version() {
         hs_crm_migrate_to_1_1_0();
         update_option('hs_crm_db_version', '1.1.0');
     }
+    
+    if (version_compare($db_version, '1.2.0', '<')) {
+        // Run migration for version 1.2.0 - Create notes table
+        hs_crm_migrate_to_1_2_0();
+        update_option('hs_crm_db_version', '1.2.0');
+    }
 }
 
 /**
@@ -127,6 +133,47 @@ function hs_crm_migrate_to_1_1_0() {
             )
         WHERE first_name = '' AND name != ''
     ");
+}
+
+/**
+ * Migrate database to version 1.2.0
+ * Creates notes table and migrates existing admin_notes
+ */
+function hs_crm_migrate_to_1_2_0() {
+    global $wpdb;
+    
+    $charset_collate = $wpdb->get_charset_collate();
+    $notes_table = $wpdb->prefix . 'hs_enquiry_notes';
+    
+    // Create notes table
+    $sql = "CREATE TABLE IF NOT EXISTS $notes_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        enquiry_id mediumint(9) NOT NULL,
+        note text NOT NULL,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY  (id),
+        KEY enquiry_id (enquiry_id)
+    ) $charset_collate;";
+    
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+    
+    // Migrate existing admin_notes to the new notes table
+    $enquiries_table = $wpdb->prefix . 'hs_enquiries';
+    $enquiries = $wpdb->get_results("SELECT id, admin_notes FROM $enquiries_table WHERE admin_notes != ''");
+    
+    foreach ($enquiries as $enquiry) {
+        if (!empty($enquiry->admin_notes)) {
+            $wpdb->insert(
+                $notes_table,
+                array(
+                    'enquiry_id' => $enquiry->id,
+                    'note' => $enquiry->admin_notes
+                ),
+                array('%d', '%s')
+            );
+        }
+    }
 }
 
 /**

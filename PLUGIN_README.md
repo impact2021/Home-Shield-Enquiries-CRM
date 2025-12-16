@@ -29,9 +29,12 @@ A comprehensive CRM system for managing painter enquiries with contact form, adm
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to **HS Enquiries > Settings** in the WordPress admin
 4. Enter your Google Maps API key (required for address autocomplete)
-5. Add the contact form to any page using the shortcode: `[hs_contact_form]`
+5. Configure your preferred timezone for displaying dates and times
+6. Add the contact form to any page using the shortcode: `[hs_contact_form]`
 
-## Google Maps API Setup
+## Configuration
+
+### Google Maps API Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
@@ -43,6 +46,23 @@ A comprehensive CRM system for managing painter enquiries with contact form, adm
    - Add website restrictions (your WordPress domain)
    - Add API restrictions (Places API and Maps JavaScript API)
 6. Enter the API key in **HS Enquiries > Settings**
+
+### Timezone Settings
+
+The plugin includes timezone configuration to ensure dates and times are displayed correctly in your local timezone:
+
+1. Go to **HS Enquiries > Settings**
+2. Select your timezone from the dropdown menu
+3. Available timezones include:
+   - Pacific/Auckland (NZDT/NZST) - Default
+   - Pacific/Chatham
+   - Australia/Sydney (AEDT/AEST)
+   - Australia/Melbourne (AEDT/AEST)
+   - Australia/Brisbane (AEST)
+   - Australia/Perth (AWST)
+   - UTC
+
+This setting overrides the WordPress timezone setting for the CRM plugin only, ensuring enquiry timestamps and notes are displayed in your preferred timezone.
 
 ## Usage
 
@@ -133,6 +153,16 @@ For issues or questions, please contact the development team or create an issue 
 GPL v2 or later
 
 ## Changelog
+
+### Version 2.0
+- Added timezone configuration in Settings
+- Improved date/time display with timezone support
+- Enhanced compatibility with older WordPress versions (< 5.3)
+- Better error handling for date formatting
+
+### Version 1.4
+- Bug fixes and improvements
+- WordPress timezone support
 
 ### Version 1.0.0
 - Initial release

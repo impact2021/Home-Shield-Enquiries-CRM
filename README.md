@@ -16,7 +16,7 @@ This plugin provides a complete CRM solution for Home Shield Painters, including
 
 1. Upload the plugin files to `/wp-content/plugins/home-shield-crm/`
 2. Activate the plugin in WordPress admin
-3. Configure Google Maps API key in Settings
+3. Configure Google Maps API key and timezone in Settings
 4. Add `[hs_contact_form]` shortcode to any page
 
 For detailed installation and usage instructions, see [PLUGIN_README.md](PLUGIN_README.md)
@@ -29,6 +29,7 @@ For detailed installation and usage instructions, see [PLUGIN_README.md](PLUGIN_
 ✅ Status change tracking  
 ✅ Professional quote emails  
 ✅ Editable quote table with automatic GST calculation  
+✅ Configurable timezone settings for accurate date/time display  
 ✅ Responsive design  
 
 ## Requirements

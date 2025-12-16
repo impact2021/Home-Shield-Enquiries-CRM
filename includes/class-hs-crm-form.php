@@ -100,9 +100,73 @@ class HS_CRM_Form {
         $result = HS_CRM_Database::insert_enquiry($data);
         
         if ($result) {
+            // Send customer thank you email
+            $this->send_customer_email($data);
+            
+            // Send admin notification email
+            $this->send_admin_notification($data, $result);
+            
             wp_send_json_success(array('message' => 'Thank you! Your enquiry has been submitted successfully.'));
         } else {
             wp_send_json_error(array('message' => 'There was an error submitting your enquiry. Please try again.'));
         }
+    }
+    
+    /**
+     * Send thank you email to customer
+     */
+    private function send_customer_email($data) {
+        $to = $data['email'];
+        $subject = 'Thank you for your enquiry - Home Shield Painters';
+        
+        $message = '<!DOCTYPE html>';
+        $message .= '<html>';
+        $message .= '<head><meta charset="UTF-8"></head>';
+        $message .= '<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">';
+        $message .= '<h1>Thank you for your enquiry</h1>';
+        $message .= '<p>Dear ' . esc_html($data['first_name']) . ',</p>';
+        $message .= '<p>Thank you for contacting Home Shield Painters. We have received your enquiry and will get back to you as soon as possible.</p>';
+        $message .= '<h3>Your Details</h3>';
+        $message .= '<p><strong>Name:</strong> ' . esc_html($data['first_name'] . ' ' . $data['last_name']) . '</p>';
+        $message .= '<p><strong>Email:</strong> ' . esc_html($data['email']) . '</p>';
+        $message .= '<p><strong>Phone:</strong> ' . esc_html($data['phone']) . '</p>';
+        $message .= '<p><strong>Address:</strong> ' . esc_html($data['address']) . '</p>';
+        $message .= '<p style="font-size: 12px; color: #666;">We look forward to working with you.</p>';
+        $message .= '<p style="font-size: 12px; color: #666;">Home Shield Painters</p>';
+        $message .= '</body>';
+        $message .= '</html>';
+        
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        
+        wp_mail($to, $subject, $message, $headers);
+    }
+    
+    /**
+     * Send notification email to admin
+     */
+    private function send_admin_notification($data, $enquiry_id) {
+        $admin_email = get_option('admin_email');
+        $subject = 'New Enquiry - Home Shield Painters';
+        
+        $dashboard_link = 'https://homeshieldpainters.co.nz/wp-admin/admin.php?page=hs-crm-enquiries';
+        
+        $message = '<!DOCTYPE html>';
+        $message .= '<html>';
+        $message .= '<head><meta charset="UTF-8"></head>';
+        $message .= '<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">';
+        $message .= '<h1>New Enquiry Received</h1>';
+        $message .= '<p>A new enquiry has been submitted via the contact form.</p>';
+        $message .= '<h3>Customer Details</h3>';
+        $message .= '<p><strong>Name:</strong> ' . esc_html($data['first_name'] . ' ' . $data['last_name']) . '</p>';
+        $message .= '<p><strong>Email:</strong> ' . esc_html($data['email']) . '</p>';
+        $message .= '<p><strong>Phone:</strong> ' . esc_html($data['phone']) . '</p>';
+        $message .= '<p><strong>Address:</strong> ' . esc_html($data['address']) . '</p>';
+        $message .= '<p><a href="' . esc_url($dashboard_link) . '" style="display: inline-block; padding: 10px 20px; background: #0073aa; color: white; text-decoration: none; border-radius: 4px;">View in Dashboard</a></p>';
+        $message .= '</body>';
+        $message .= '</html>';
+        
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        
+        wp_mail($admin_email, $subject, $message, $headers);
     }
 }

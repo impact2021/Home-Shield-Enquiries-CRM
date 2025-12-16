@@ -279,6 +279,10 @@ class HS_CRM_Admin {
         $result = HS_CRM_Database::update_status($enquiry_id, $new_status);
         
         if ($result) {
+            // Add automatic note for status change
+            $note_text = sprintf('Status changed from "%s" to "%s"', $old_status, $new_status);
+            HS_CRM_Database::add_note($enquiry_id, $note_text);
+            
             wp_send_json_success(array(
                 'message' => 'Status updated successfully.'
             ));

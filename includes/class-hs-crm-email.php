@@ -58,6 +58,25 @@ class HS_CRM_Email {
         if ($result) {
             // Mark email as sent
             HS_CRM_Database::mark_email_sent($enquiry_id);
+            
+            // Add automatic note for email sent
+            $email_type_label = '';
+            switch($email_type) {
+                case 'send_quote':
+                    $email_type_label = 'Quote';
+                    break;
+                case 'send_invoice':
+                    $email_type_label = 'Invoice';
+                    break;
+                case 'send_receipt':
+                    $email_type_label = 'Receipt';
+                    break;
+                default:
+                    $email_type_label = 'Email';
+            }
+            $note_text = sprintf('%s sent to %s', $email_type_label, $enquiry->email);
+            HS_CRM_Database::add_note($enquiry_id, $note_text);
+            
             wp_send_json_success(array('message' => 'Email sent successfully.'));
         } else {
             wp_send_json_error(array('message' => 'Failed to send email.'));

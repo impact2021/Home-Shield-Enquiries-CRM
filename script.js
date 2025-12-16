@@ -18,7 +18,8 @@ class QuoteTable {
         this.gstRateInput.addEventListener('change', () => this.updateAllRows());
         
         // Set today's date
-        document.getElementById('quoteDate').valueAsDate = new Date();
+        const today = new Date();
+        document.getElementById('quoteDate').value = today.toISOString().split('T')[0];
         
         // Add initial row
         this.addRow();
@@ -216,7 +217,7 @@ class QuoteTable {
         `;
     }
 
-    copyEmailHTML() {
+    async copyEmailHTML() {
         const data = this.getQuoteData();
         
         if (data.items.length === 0) {
@@ -226,7 +227,18 @@ class QuoteTable {
         
         const emailHTML = this.createEmailHTML(data);
         
-        // Create a temporary textarea to copy the HTML
+        // Try modern Clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try {
+                await navigator.clipboard.writeText(emailHTML);
+                alert('Email HTML copied to clipboard! You can now paste it into your email client.');
+                return;
+            } catch (err) {
+                console.error('Clipboard API failed:', err);
+            }
+        }
+        
+        // Fallback to older method for browsers that don't support Clipboard API
         const tempTextarea = document.createElement('textarea');
         tempTextarea.value = emailHTML;
         tempTextarea.style.position = 'fixed';

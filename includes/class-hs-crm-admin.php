@@ -108,7 +108,7 @@ class HS_CRM_Admin {
                                 <th style="width: 23%;">Action</th>
                             </tr>
                             <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                <td><?php echo esc_html(date('d/m/Y', strtotime($enquiry->created_at))); ?></td>
+                                <td><?php echo esc_html(wp_date('d/m/Y H:i', strtotime($enquiry->created_at))); ?></td>
                                 <td>
                                     <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
                                     <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small><br>
@@ -145,7 +145,7 @@ class HS_CRM_Admin {
                                 <?php foreach ($notes as $note): ?>
                                     <tr class="hs-crm-note-row <?php echo $row_class; ?>" data-note-id="<?php echo esc_attr($note->id); ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
                                         <td class="hs-crm-note-date">
-                                            <?php echo esc_html(date('d/m/Y H:i', strtotime($note->created_at))); ?>
+                                            <?php echo esc_html(wp_date('d/m/Y H:i', strtotime($note->created_at))); ?>
                                         </td>
                                         <td colspan="3" class="hs-crm-note-content">
                                             <div class="hs-crm-note-text"><?php echo esc_html(stripslashes($note->note)); ?></div>
@@ -289,12 +289,17 @@ class HS_CRM_Admin {
             }
             $note_id = HS_CRM_Database::add_note($enquiry_id, $note_text);
             
+            // Get current time and format it for Auckland timezone
+            $current_timestamp = current_time('timestamp');
+            $formatted_date = wp_date('d/m/Y H:i', $current_timestamp);
+            
             wp_send_json_success(array(
                 'message' => 'Status updated successfully.',
                 'note' => array(
                     'id' => $note_id,
                     'text' => $note_text,
-                    'created_at' => current_time('mysql')
+                    'created_at' => current_time('mysql'),
+                    'formatted_date' => $formatted_date
                 )
             ));
         } else {
@@ -373,10 +378,15 @@ class HS_CRM_Admin {
         $note_id = HS_CRM_Database::add_note($enquiry_id, $note);
         
         if ($note_id) {
+            // Get current time and format it for Auckland timezone
+            $current_timestamp = current_time('timestamp');
+            $formatted_date = wp_date('d/m/Y H:i', $current_timestamp);
+            
             wp_send_json_success(array(
                 'message' => 'Note added successfully.',
                 'note_id' => $note_id,
-                'created_at' => current_time('mysql')
+                'created_at' => current_time('mysql'),
+                'formatted_date' => $formatted_date
             ));
         } else {
             wp_send_json_error(array('message' => 'Failed to add note.'));

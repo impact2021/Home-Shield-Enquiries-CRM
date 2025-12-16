@@ -193,7 +193,8 @@ function hs_crm_enqueue_assets() {
     // Localize script for AJAX
     wp_localize_script('hs-crm-scripts', 'hsCrmAjax', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('hs_crm_nonce')
+        'nonce' => wp_create_nonce('hs_crm_nonce'),
+        'thankYouUrl' => home_url('/thank-you/')
     ));
 }
 add_action('wp_enqueue_scripts', 'hs_crm_enqueue_assets');

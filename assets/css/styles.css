@@ -152,7 +152,7 @@
     font-weight: 600;
 }
 
-/* Alternating row backgrounds */
+/* Alternating row backgrounds with better delineation */
 .hs-crm-even-row {
     background: #f9f9f9;
 }
@@ -164,6 +164,21 @@
 .hs-crm-enquiry-row td {
     padding: 12px 8px !important;
     border-bottom: none !important;
+}
+
+/* Add spacing and rounded corners to enquiry groups */
+.hs-crm-enquiry-row td:first-child {
+    border-top-left-radius: 8px;
+    padding-left: 12px !important;
+}
+
+.hs-crm-enquiry-row td:last-child {
+    border-top-right-radius: 8px;
+    padding-right: 12px !important;
+}
+
+.hs-crm-enquiry-row {
+    border-top: 12px solid transparent;
 }
 
 .hs-crm-note-row td {
@@ -194,7 +209,22 @@
 .hs-crm-add-note-row td {
     padding: 8px !important;
     border-top: 1px solid #e0e0e0 !important;
-    border-bottom: 2px solid #ccc !important;
+    border-bottom: none !important;
+}
+
+/* Add rounded corners to bottom of customer section */
+.hs-crm-add-note-row td:first-child {
+    border-bottom-left-radius: 8px;
+    padding-left: 12px !important;
+}
+
+.hs-crm-add-note-row td:last-child {
+    border-bottom-right-radius: 8px;
+    padding-right: 12px !important;
+}
+
+.hs-crm-add-note-row {
+    border-bottom: 12px solid transparent;
 }
 
 .hs-crm-new-note {

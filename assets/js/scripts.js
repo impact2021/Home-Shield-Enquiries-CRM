@@ -44,16 +44,15 @@ jQuery(document).ready(function($) {
             data: $form.serialize() + '&action=hs_crm_submit_form',
             success: function(response) {
                 if (response.success) {
-                    $messages.html('<div class="hs-crm-success">' + response.data.message + '</div>');
-                    $form[0].reset();
+                    // Redirect to thank you page
+                    window.location.href = hsCrmAjax.thankYouUrl;
                 } else {
                     $messages.html('<div class="hs-crm-error">' + response.data.message + '</div>');
+                    $submitBtn.prop('disabled', false).text('Submit Enquiry');
                 }
             },
             error: function() {
                 $messages.html('<div class="hs-crm-error">An error occurred. Please try again.</div>');
-            },
-            complete: function() {
                 $submitBtn.prop('disabled', false).text('Submit Enquiry');
             }
         });

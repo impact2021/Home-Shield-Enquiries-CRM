@@ -85,20 +85,10 @@ class HS_CRM_Admin {
             
             <div class="hs-crm-table-container">
                 <table class="wp-list-table widefat fixed hs-crm-enquiries-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 18%;">Contact Info</th>
-                            <th style="width: 20%;">Address</th>
-                            <th style="width: 12%;">Status</th>
-                            <th style="width: 10%;">Created</th>
-                            <th style="width: 15%;">Status Change</th>
-                            <th style="width: 25%;">Action</th>
-                        </tr>
-                    </thead>
                     <tbody>
                         <?php if (empty($enquiries)): ?>
                             <tr>
-                                <td colspan="6" style="text-align: center;">No enquiries found.</td>
+                                <td colspan="7" style="text-align: center;">No enquiries found.</td>
                             </tr>
                         <?php else: ?>
                             <?php 
@@ -110,14 +100,25 @@ class HS_CRM_Admin {
                             ?>
                                 <!-- Customer Header Row -->
                                 <tr class="hs-crm-customer-header-row <?php echo $row_class; ?>">
-                                    <th style="width: 18%;">Contact Info</th>
-                                    <th style="width: 20%;">Address</th>
-                                    <th style="width: 12%;">Status</th>
                                     <th style="width: 10%;">Created</th>
-                                    <th style="width: 15%;">Status Change</th>
-                                    <th style="width: 25%;">Action</th>
+                                    <th style="width: 12%;">First Message</th>
+                                    <th style="width: 16%;">Contact Info</th>
+                                    <th style="width: 18%;">Address</th>
+                                    <th style="width: 10%;">Status</th>
+                                    <th style="width: 13%;">Status Change</th>
+                                    <th style="width: 21%;">Action</th>
                                 </tr>
                                 <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
+                                    <td><?php echo esc_html(date('d/m/Y', strtotime($enquiry->created_at))); ?></td>
+                                    <td>
+                                        <?php 
+                                        if (!empty($enquiry->first_email_sent_at)) {
+                                            echo esc_html(date('d/m/Y H:i', strtotime($enquiry->first_email_sent_at)));
+                                        } else {
+                                            echo '<small style="color: #999;">Not sent</small>';
+                                        }
+                                        ?>
+                                    </td>
                                     <td>
                                         <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
                                         <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small><br>
@@ -129,7 +130,6 @@ class HS_CRM_Admin {
                                             <?php echo esc_html($enquiry->status); ?>
                                         </span>
                                     </td>
-                                    <td><?php echo esc_html(date('d/m/Y', strtotime($enquiry->created_at))); ?></td>
                                     <td>
                                         <select class="hs-crm-status-select" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" data-current-status="<?php echo esc_attr($enquiry->status); ?>">
                                             <option value="">Change Status...</option>
@@ -154,7 +154,7 @@ class HS_CRM_Admin {
                                 <?php if (!empty($notes)): ?>
                                     <?php foreach ($notes as $note): ?>
                                         <tr class="hs-crm-note-row <?php echo $row_class; ?>" data-note-id="<?php echo esc_attr($note->id); ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                            <td colspan="3" class="hs-crm-note-content">
+                                            <td colspan="4" class="hs-crm-note-content">
                                                 <div class="hs-crm-note-text"><?php echo esc_html(stripslashes($note->note)); ?></div>
                                             </td>
                                             <td class="hs-crm-note-date">
@@ -169,7 +169,7 @@ class HS_CRM_Admin {
                                 
                                 <!-- Add note row -->
                                 <tr class="hs-crm-add-note-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                    <td colspan="5">
+                                    <td colspan="6">
                                         <textarea class="hs-crm-new-note" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>" rows="2" placeholder="Add a new note..."></textarea>
                                     </td>
                                     <td>

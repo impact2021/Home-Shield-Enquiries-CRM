@@ -85,6 +85,12 @@ function hs_crm_check_db_version() {
         hs_crm_migrate_to_1_2_0();
         update_option('hs_crm_db_version', '1.2.0');
     }
+    
+    if (version_compare($db_version, '1.3.0', '<')) {
+        // Run migration for version 1.3.0 - Add first_email_sent_at column
+        hs_crm_migrate_to_1_3_0();
+        update_option('hs_crm_db_version', '1.3.0');
+    }
 }
 
 /**
@@ -173,6 +179,27 @@ function hs_crm_migrate_to_1_2_0() {
                 array('%d', '%s')
             );
         }
+    }
+}
+
+/**
+ * Migrate database to version 1.3.0
+ * Adds first_email_sent_at column to track when first message was sent
+ */
+function hs_crm_migrate_to_1_3_0() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'hs_enquiries';
+    
+    // Check if column exists before adding it
+    $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
+    $column_names = array();
+    foreach ($columns as $column) {
+        $column_names[] = $column->Field;
+    }
+    
+    // Add first_email_sent_at column if it doesn't exist
+    if (!in_array('first_email_sent_at', $column_names)) {
+        $wpdb->query("ALTER TABLE $table_name ADD COLUMN first_email_sent_at datetime DEFAULT NULL AFTER email_sent");
     }
 }
 

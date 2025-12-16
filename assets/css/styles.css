@@ -138,13 +138,19 @@
 .hs-crm-table-container {
     background: #fff;
     padding: 20px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
 }
 
 .hs-crm-enquiries-table {
     margin-top: 0;
     border-collapse: collapse;
+    border: none !important;
+}
+
+.hs-crm-enquiries-table thead {
+    display: none !important;
 }
 
 .hs-crm-enquiries-table th {
@@ -253,11 +259,11 @@ tbody tr.hs-crm-customer-header-row:first-child {
 
 /* Customer header row styling */
 .hs-crm-customer-header-row th {
-    background: #e8e8e8 !important;
+    background: #061257 !important;
     font-weight: 600 !important;
     font-size: 11px !important;
     text-transform: uppercase !important;
-    color: #666 !important;
+    color: #ffffff !important;
     padding: 6px 8px !important;
     border-left: 1px solid #ddd !important;
     border-right: 1px solid #ddd !important;

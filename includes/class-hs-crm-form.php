@@ -52,7 +52,6 @@ class HS_CRM_Form {
                 
                 <div class="hs-crm-form-group">
                     <input type="text" id="hs_address" name="address" placeholder="Address *" required>
-                    <small style="color: #666; font-size: 12px;">Start typing your New Zealand address (autocomplete enabled)</small>
                 </div>
                 
                 <div class="hs-crm-form-group">

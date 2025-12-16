@@ -84,8 +84,11 @@ function hs_crm_format_date($mysql_date, $format = 'd/m/Y H:i') {
     $timezone_string = get_option('hs_crm_timezone', 'Pacific/Auckland');
     
     try {
-        // Create DateTime object from MySQL date (which is in UTC)
-        $date = new DateTime($mysql_date, new DateTimeZone('UTC'));
+        // Create DateTime object from MySQL date
+        // MySQL CURRENT_TIMESTAMP uses the database server's timezone (usually UTC)
+        // But we need to treat it as the WordPress site timezone for proper conversion
+        $wp_timezone = wp_timezone_string();
+        $date = new DateTime($mysql_date, new DateTimeZone($wp_timezone));
         
         // Convert to plugin timezone
         $date->setTimezone(new DateTimeZone($timezone_string));

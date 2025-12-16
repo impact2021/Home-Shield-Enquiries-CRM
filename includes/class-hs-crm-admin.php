@@ -105,7 +105,7 @@ class HS_CRM_Admin {
                                 <th style="width: 20%;">Address</th>
                                 <th style="width: 10%;">Status</th>
                                 <th style="width: 18%;">Status Change</th>
-                                <th style="width: 24%;">Action</th>
+                                <th style="width: 23%;">Action</th>
                             </tr>
                             <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
                                 <td><?php echo esc_html(date('d/m/Y', strtotime($enquiry->created_at))); ?></td>

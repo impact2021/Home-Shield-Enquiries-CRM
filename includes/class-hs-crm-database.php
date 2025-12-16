@@ -222,7 +222,7 @@ class HS_CRM_Database {
         $update_format = array('%d');
         
         // Only set first_email_sent_at if it's null (first email)
-        if ($enquiry && empty($enquiry->first_email_sent_at)) {
+        if ($enquiry && is_null($enquiry->first_email_sent_at)) {
             $update_data['first_email_sent_at'] = current_time('mysql');
             $update_format[] = '%s';
         }

@@ -191,15 +191,13 @@ function hs_crm_migrate_to_1_3_0() {
     $table_name = $wpdb->prefix . 'hs_enquiries';
     
     // Check if column exists before adding it
-    $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
-    $column_names = array();
-    foreach ($columns as $column) {
-        $column_names[] = $column->Field;
-    }
+    $columns = $wpdb->get_results("SHOW COLUMNS FROM {$table_name}");
+    $column_names = array_column($columns, 'Field');
     
     // Add first_email_sent_at column if it doesn't exist
     if (!in_array('first_email_sent_at', $column_names)) {
-        $wpdb->query("ALTER TABLE $table_name ADD COLUMN first_email_sent_at datetime DEFAULT NULL AFTER email_sent");
+        // Table name is safe as it uses $wpdb->prefix which is sanitized by WordPress
+        $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN first_email_sent_at datetime DEFAULT NULL AFTER email_sent");
     }
 }
 

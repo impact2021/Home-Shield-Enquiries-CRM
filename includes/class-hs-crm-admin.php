@@ -108,7 +108,7 @@ class HS_CRM_Admin {
                                 <th style="width: 23%;">Action</th>
                             </tr>
                             <tr class="hs-crm-enquiry-row <?php echo $row_class; ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
-                                <td><?php echo esc_html(mysql2date('d/m/Y H:i', $enquiry->created_at, false)); ?></td>
+                                <td><?php echo esc_html(mysql2date('d/m/Y H:i', $enquiry->created_at)); ?></td>
                                 <td>
                                     <strong><?php echo esc_html($enquiry->first_name . ' ' . $enquiry->last_name); ?></strong><br>
                                     <small style="color: #666;"><?php echo esc_html($enquiry->email); ?></small><br>
@@ -145,7 +145,7 @@ class HS_CRM_Admin {
                                 <?php foreach ($notes as $note): ?>
                                     <tr class="hs-crm-note-row <?php echo $row_class; ?>" data-note-id="<?php echo esc_attr($note->id); ?>" data-enquiry-id="<?php echo esc_attr($enquiry->id); ?>">
                                         <td class="hs-crm-note-date">
-                                            <?php echo esc_html(mysql2date('d/m/Y H:i', $note->created_at, false)); ?>
+                                            <?php echo esc_html(mysql2date('d/m/Y H:i', $note->created_at)); ?>
                                         </td>
                                         <td colspan="3" class="hs-crm-note-content">
                                             <div class="hs-crm-note-text"><?php echo esc_html(stripslashes($note->note)); ?></div>

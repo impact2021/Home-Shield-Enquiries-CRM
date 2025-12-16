@@ -18,18 +18,7 @@ class HS_CRM_Form {
         add_action('wp_ajax_nopriv_hs_crm_submit_form', array($this, 'handle_submission'));
     }
     
-    /**
-     * Get available job types
-     */
-    public static function get_job_types() {
-        return array(
-            'interior_painting' => 'Interior Painting',
-            'exterior_painting' => 'Exterior Painting',
-            'roof_painting' => 'Roof Painting',
-            'fence_painting' => 'Fence Painting',
-            'commercial_painting' => 'Commercial Painting'
-        );
-    }
+
     
     /**
      * Render contact form
@@ -41,40 +30,29 @@ class HS_CRM_Form {
             <form id="hs-crm-contact-form" class="hs-crm-form" method="post">
                 <div class="hs-crm-form-messages"></div>
                 
-                <div class="hs-crm-form-group">
-                    <label for="hs_first_name">First Name <span class="required">*</span></label>
-                    <input type="text" id="hs_first_name" name="first_name" required>
+                <div class="hs-crm-form-row">
+                    <div class="hs-crm-form-group hs-crm-form-half">
+                        <input type="text" id="hs_first_name" name="first_name" placeholder="First Name *" required>
+                    </div>
+                    
+                    <div class="hs-crm-form-group hs-crm-form-half">
+                        <input type="text" id="hs_last_name" name="last_name" placeholder="Last Name *" required>
+                    </div>
+                </div>
+                
+                <div class="hs-crm-form-row">
+                    <div class="hs-crm-form-group hs-crm-form-half">
+                        <input type="email" id="hs_email" name="email" placeholder="Email *" required>
+                    </div>
+                    
+                    <div class="hs-crm-form-group hs-crm-form-half">
+                        <input type="tel" id="hs_phone" name="phone" placeholder="Phone Number *" required>
+                    </div>
                 </div>
                 
                 <div class="hs-crm-form-group">
-                    <label for="hs_last_name">Last Name <span class="required">*</span></label>
-                    <input type="text" id="hs_last_name" name="last_name" required>
-                </div>
-                
-                <div class="hs-crm-form-group">
-                    <label for="hs_email">Email <span class="required">*</span></label>
-                    <input type="email" id="hs_email" name="email" required>
-                </div>
-                
-                <div class="hs-crm-form-group">
-                    <label for="hs_phone">Phone Number <span class="required">*</span></label>
-                    <input type="tel" id="hs_phone" name="phone" required>
-                </div>
-                
-                <div class="hs-crm-form-group">
-                    <label for="hs_address">Address <span class="required">*</span></label>
-                    <input type="text" id="hs_address" name="address" placeholder="Start typing your New Zealand address..." required>
+                    <input type="text" id="hs_address" name="address" placeholder="Address * (Start typing your New Zealand address...)" required>
                     <small style="color: #666; font-size: 12px;">Address autocomplete restricted to New Zealand</small>
-                </div>
-                
-                <div class="hs-crm-form-group">
-                    <label for="hs_job_type">Job Requirement <span class="required">*</span></label>
-                    <select id="hs_job_type" name="job_type" required>
-                        <option value="">Select a job type...</option>
-                        <?php foreach (self::get_job_types() as $key => $label): ?>
-                            <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></option>
-                        <?php endforeach; ?>
-                    </select>
                 </div>
                 
                 <div class="hs-crm-form-group">
@@ -98,7 +76,7 @@ class HS_CRM_Form {
         }
         
         // Validate required fields
-        $required_fields = array('first_name', 'last_name', 'email', 'phone', 'address', 'job_type');
+        $required_fields = array('first_name', 'last_name', 'email', 'phone', 'address');
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
                 wp_send_json_error(array('message' => 'Please fill in all required fields.'));
@@ -116,8 +94,7 @@ class HS_CRM_Form {
             'last_name' => sanitize_text_field($_POST['last_name']),
             'email' => sanitize_email($_POST['email']),
             'phone' => sanitize_text_field($_POST['phone']),
-            'address' => sanitize_textarea_field($_POST['address']),
-            'job_type' => sanitize_text_field($_POST['job_type'])
+            'address' => sanitize_textarea_field($_POST['address'])
         );
         
         // Insert into database

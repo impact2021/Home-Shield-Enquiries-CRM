@@ -62,7 +62,7 @@ class HS_CRM_Database {
                 'email' => sanitize_email($data['email']),
                 'phone' => sanitize_text_field($data['phone']),
                 'address' => sanitize_textarea_field($data['address']),
-                'job_type' => sanitize_text_field($data['job_type']),
+                'job_type' => '',
                 'status' => 'Not Actioned',
                 'email_sent' => 0,
                 'admin_notes' => ''

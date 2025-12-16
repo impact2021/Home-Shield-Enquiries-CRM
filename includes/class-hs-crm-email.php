@@ -174,7 +174,6 @@ class HS_CRM_Email {
         $html .= '<p><strong>Email:</strong> ' . esc_html($enquiry->email) . '</p>';
         $html .= '<p><strong>Address:</strong> ' . esc_html($enquiry->address) . '</p>';
         $html .= '<p><strong>Phone:</strong> ' . esc_html($enquiry->phone) . '</p>';
-        $html .= '<p><strong>Job Type:</strong> ' . esc_html($enquiry->job_type) . '</p>';
         $html .= '</div>';
         
         // Footer

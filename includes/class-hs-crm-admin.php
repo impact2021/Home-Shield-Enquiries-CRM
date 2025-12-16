@@ -45,7 +45,6 @@ class HS_CRM_Admin {
         $current_status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : 'all';
         $enquiries = HS_CRM_Database::get_enquiries($current_status === 'all' ? null : $current_status);
         $counts = HS_CRM_Database::get_status_counts();
-        $job_types = HS_CRM_Form::get_job_types();
         
         ?>
         <div class="wrap hs-crm-admin-wrap">
@@ -82,21 +81,20 @@ class HS_CRM_Admin {
                 <table class="wp-list-table widefat fixed striped hs-crm-enquiries-table">
                     <thead>
                         <tr>
-                            <th style="width: 13%;">Name</th>
-                            <th style="width: 9%;">Phone</th>
-                            <th style="width: 13%;">Address</th>
-                            <th style="width: 10%;">Job Type</th>
-                            <th style="width: 9%;">Status</th>
-                            <th style="width: 7%;">Created</th>
-                            <th style="width: 9%;">Status Change</th>
-                            <th style="width: 12%;">Action</th>
+                            <th style="width: 15%;">Name</th>
+                            <th style="width: 11%;">Phone</th>
+                            <th style="width: 15%;">Address</th>
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 8%;">Created</th>
+                            <th style="width: 10%;">Status Change</th>
+                            <th style="width: 13%;">Action</th>
                             <th style="width: 18%;">Notes</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($enquiries)): ?>
                             <tr>
-                                <td colspan="9" style="text-align: center;">No enquiries found.</td>
+                                <td colspan="8" style="text-align: center;">No enquiries found.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($enquiries as $enquiry): ?>
@@ -107,7 +105,6 @@ class HS_CRM_Admin {
                                     </td>
                                     <td><?php echo esc_html($enquiry->phone); ?></td>
                                     <td><?php echo esc_html($enquiry->address); ?></td>
-                                    <td><?php echo esc_html($job_types[$enquiry->job_type] ?? $enquiry->job_type); ?></td>
                                     <td>
                                         <span class="hs-crm-status-badge status-<?php echo esc_attr(strtolower(str_replace(' ', '-', $enquiry->status))); ?>">
                                             <?php echo esc_html($enquiry->status); ?>

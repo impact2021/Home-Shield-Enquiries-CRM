@@ -29,6 +29,7 @@ class HS_CRM_Database {
             job_type varchar(100) NOT NULL,
             status varchar(50) DEFAULT 'Not Actioned' NOT NULL,
             email_sent tinyint(1) DEFAULT 0 NOT NULL,
+            first_email_sent_at datetime DEFAULT NULL,
             admin_notes text DEFAULT '' NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
@@ -215,11 +216,22 @@ class HS_CRM_Database {
         
         $table_name = $wpdb->prefix . 'hs_enquiries';
         
+        // Check if this is the first email being sent
+        $enquiry = self::get_enquiry($id);
+        $update_data = array('email_sent' => 1);
+        $update_format = array('%d');
+        
+        // Only set first_email_sent_at if it's null (first email)
+        if ($enquiry && is_null($enquiry->first_email_sent_at)) {
+            $update_data['first_email_sent_at'] = current_time('mysql');
+            $update_format[] = '%s';
+        }
+        
         $result = $wpdb->update(
             $table_name,
-            array('email_sent' => 1),
+            $update_data,
             array('id' => $id),
-            array('%d'),
+            $update_format,
             array('%d')
         );
         

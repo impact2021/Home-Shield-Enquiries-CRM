@@ -287,10 +287,15 @@ class HS_CRM_Admin {
             } else {
                 $note_text = sprintf('Status changed to "%s"', $new_status);
             }
-            HS_CRM_Database::add_note($enquiry_id, $note_text);
+            $note_id = HS_CRM_Database::add_note($enquiry_id, $note_text);
             
             wp_send_json_success(array(
-                'message' => 'Status updated successfully.'
+                'message' => 'Status updated successfully.',
+                'note' => array(
+                    'id' => $note_id,
+                    'text' => $note_text,
+                    'created_at' => current_time('mysql')
+                )
             ));
         } else {
             wp_send_json_error(array('message' => 'Failed to update status.'));
